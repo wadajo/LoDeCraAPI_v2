@@ -25,7 +25,9 @@ public class LibroController {
     }
 
     @GetMapping("/libros")
-    public ResponseEntity<List<LibroDto>> librosDisponibles(@RequestParam(required = false) String keyword,@RequestParam(required = false) String campoABuscar){
+    public ResponseEntity<List<LibroDto>> librosDisponibles
+            (@RequestParam(required = false) String keyword,
+             @RequestParam(required = false) String campoABuscar){
         List<Libro> todosLosLibros;
         if(null!=keyword && null!=campoABuscar)
             todosLosLibros=libroService.getLibrosPorBusquedaAvz(keyword,campoABuscar);

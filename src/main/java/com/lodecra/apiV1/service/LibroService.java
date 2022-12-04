@@ -9,7 +9,8 @@ import java.util.List;
 public interface LibroService {
 
     List<Libro> getLibros();
-    Libro getLibroPorId(String id);
     List<Libro> getLibrosPorBusquedaGral(String keyword);
     List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar);
+    Libro getLibroPorId(String id);
+    Boolean existeLibroConMismoCodigo(String id);
 }
