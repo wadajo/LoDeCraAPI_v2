@@ -5,6 +5,8 @@ import com.lodecra.apiV1.mapper.LibroMapper;
 import com.lodecra.apiV1.service.LibroService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,10 +24,20 @@ public class LibroController {
     }
 
     @GetMapping("/libros")
-    public ResponseEntity<List<LibroDto>> librosDisponibles(){
-        var todosLosLibros = libroService.getLibros();
+    public ResponseEntity<List<LibroDto>> librosDisponibles(@RequestParam(required = false) String keyword){
+        var todosLosLibros = null!=keyword?
+                libroService.getLibrosPorBusquedaGral(keyword):
+                libroService.getLibros();
+
         var librosDto = todosLosLibros.stream().map(mapper::libroADto).toList();
         return ResponseEntity.ok().body(librosDto);
+    }
+
+    @GetMapping("/libros/{id}")
+    public ResponseEntity<LibroDto> libroPorId(@PathVariable String id){
+        var unLibro = libroService.getLibroPorId(id);
+        var libroDto = mapper.libroADto(unLibro);
+        return ResponseEntity.ok().body(libroDto);
     }
 
 }

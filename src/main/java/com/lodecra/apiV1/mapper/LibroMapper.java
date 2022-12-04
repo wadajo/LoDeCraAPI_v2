@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public interface LibroMapper {
 
-    LibroDto libroADto(Libro original);
+    default LibroDto libroADto(Libro original) {
+        return new LibroDto(original.getId(), original.getNombre());
+    }
 
 }
