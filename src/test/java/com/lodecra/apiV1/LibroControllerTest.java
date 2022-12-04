@@ -90,4 +90,28 @@ public class LibroControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name", is(libro1.getTitulo())));
     }
+
+    @Test
+    public void cuandoBuscoUnLibroAvz_devuelveListaConDosLibros()
+            throws Exception {
+
+        Libro libro1 = new Libro();
+        libro1.setTitulo("El Señor de los Anillos I");
+        Libro libro2 = new Libro();
+        libro2.setTitulo("El Señor de los Anillos II");
+
+        List<Libro> encontrados = List.of(libro1,libro2);
+
+        given(libroService.getLibrosPorBusquedaAvz(anyString(),anyString())).willReturn(encontrados);
+        given(mapper.libroADto(libro1)).willReturn(new LibroDto(libro1.getId(), libro1.getTitulo()));
+        given(mapper.libroADto(libro2)).willReturn(new LibroDto(libro2.getId(), libro2.getTitulo()));
+
+        mvc.perform(get("/libros")
+                        .queryParam("keyword","anillos")
+                        .queryParam("campoABuscar","titulo")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is(libro1.getTitulo())));
+    }
 }

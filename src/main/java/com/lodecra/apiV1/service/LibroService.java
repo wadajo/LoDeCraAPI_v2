@@ -11,4 +11,5 @@ public interface LibroService {
     List<Libro> getLibros();
     Libro getLibroPorId(String id);
     List<Libro> getLibrosPorBusquedaGral(String keyword);
+    List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar);
 }
