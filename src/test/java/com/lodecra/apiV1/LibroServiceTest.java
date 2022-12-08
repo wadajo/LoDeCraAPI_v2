@@ -1,7 +1,7 @@
 package com.lodecra.apiV1;
 
-import com.lodecra.apiV1.entity.Libro;
-import com.lodecra.apiV1.service.LibroService;
+import com.lodecra.apiV1.model.Libro;
+import com.lodecra.apiV1.service.port.LibroService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

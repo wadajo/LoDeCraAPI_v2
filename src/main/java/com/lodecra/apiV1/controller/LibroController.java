@@ -1,9 +1,9 @@
 package com.lodecra.apiV1.controller;
 
 import com.lodecra.apiV1.dto.LibroDto;
-import com.lodecra.apiV1.entity.Libro;
+import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.mapper.LibroMapper;
-import com.lodecra.apiV1.service.LibroService;
+import com.lodecra.apiV1.service.port.LibroService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,11 +1,9 @@
-package com.lodecra.apiV1.service;
+package com.lodecra.apiV1.service.port;
 
-import com.lodecra.apiV1.entity.Libro;
-import org.springframework.stereotype.Service;
+import com.lodecra.apiV1.model.Libro;
 
 import java.util.List;
 
-@Service
 public interface LibroService {
 
     List<Libro> getLibros();

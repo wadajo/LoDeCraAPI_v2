@@ -1,4 +1,4 @@
-package com.lodecra.apiV1.entity;
+package com.lodecra.apiV1.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
