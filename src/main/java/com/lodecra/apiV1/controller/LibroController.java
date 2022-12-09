@@ -1,9 +1,10 @@
 package com.lodecra.apiV1.controller;
 
 import com.lodecra.apiV1.dto.LibroDto;
+import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
-import com.lodecra.apiV1.mapper.LibroMapper;
 import com.lodecra.apiV1.service.port.LibroService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,11 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class LibroController {
 
-    LibroService libroService;
+    private final LibroService libroService;
 
-    LibroMapper mapper;
+    private final LibroMapper mapper;
 
     public LibroController(LibroService libroService, LibroMapper mapper) {
         this.libroService = libroService;
@@ -29,21 +31,25 @@ public class LibroController {
             (@RequestParam(required = false) String keyword,
              @RequestParam(required = false) String campoABuscar){
         List<Libro> todosLosLibros;
-        if(null!=keyword && null!=campoABuscar)
-            todosLosLibros=libroService.getLibrosPorBusquedaAvz(keyword,campoABuscar);
-        else if(null != keyword)
-            todosLosLibros=libroService.getLibrosPorBusquedaGral(keyword);
-        else
-            todosLosLibros=libroService.getLibros();
-
-        var librosDto = todosLosLibros.stream().map(mapper::libroADto).toList();
+        if(null!=keyword && null!=campoABuscar) {
+            log.info("Llamando a GET /libros con búsqueda avanzada por "+campoABuscar+". Keyword: " + keyword);
+            todosLosLibros = libroService.getLibrosPorBusquedaAvz(keyword, campoABuscar);
+        } else if(null != keyword) {
+            log.info("Llamando a GET /libros con búsqueda general. Keyword: " + keyword);
+            todosLosLibros = libroService.getLibrosPorBusquedaGral(keyword);
+        } else {
+            log.info("Llamando a GET /libros.");
+            todosLosLibros = libroService.getLibros();
+        }
+        var librosDto = todosLosLibros.stream().map(mapper::libroToLibroDto).toList();
+        log.info("Devolviendo "+librosDto.size()+" libros.");
         return ResponseEntity.ok().body(librosDto);
     }
 
     @GetMapping("/libros/{id}")
     public ResponseEntity<LibroDto> libroPorId(@PathVariable String id){
         var unLibro = libroService.getLibroPorId(id);
-        var libroDto = mapper.libroADto(unLibro);
+        var libroDto = mapper.libroToLibroDto(unLibro);
         return ResponseEntity.ok().body(libroDto);
     }
 
