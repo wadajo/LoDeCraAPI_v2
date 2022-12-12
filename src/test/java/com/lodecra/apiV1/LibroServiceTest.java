@@ -41,12 +41,12 @@ public class LibroServiceTest {
 
     @Test
     public void cuandoPreguntoSiTieneElMismoCodigo_respondeSi(){
-        libro1.setId("Uno");
-        libro2.setId("Uno");
+        libro1.setCodigo("Uno");
+        libro2.setCodigo("Uno");
 
-        when(libroService.existeLibroConMismoCodigo(eq(libro1.getId()))).thenReturn(true);
+        when(libroService.existeLibroConMismoCodigo(eq(libro1.getCodigo()))).thenReturn(true);
 
-        Boolean resultado = libroService.existeLibroConMismoCodigo(libro2.getId());
+        Boolean resultado = libroService.existeLibroConMismoCodigo(libro2.getCodigo());
         assertEquals(resultado,true);
     }
 }

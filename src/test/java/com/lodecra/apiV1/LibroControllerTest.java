@@ -42,7 +42,7 @@ public class LibroControllerTest {
         List<Libro> todosLosLibros = List.of(libro);
 
         given(libroService.getLibros()).willReturn(todosLosLibros);
-        given(mapper.libroToLibroDto(libro)).willReturn(new LibroDto(libro.getId(), libro.getTitulo(),libro.getAutor(),libro.getPrecio(), libro.getEditorial(), libro.getContacto(), libro.getStock(), libro.getDescartado()));
+        given(mapper.libroToLibroDto(libro)).willReturn(new LibroDto(libro.getCodigo(), libro.getTitulo(),libro.getAutor(),libro.getPrecio(), libro.getEditorial(), libro.getContacto(), libro.getStock(), libro.getDescartado()));
 
         mvc.perform(get("/libros")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -59,7 +59,7 @@ public class LibroControllerTest {
         libro.setTitulo("unico");
 
         given(libroService.getLibroPorId(anyString())).willReturn(libro);
-        given(mapper.libroToLibroDto(libro)).willReturn(new LibroDto(libro.getId(), libro.getTitulo(),libro.getAutor(),libro.getPrecio(), libro.getEditorial(), libro.getContacto(), libro.getStock(), libro.getDescartado()));
+        given(mapper.libroToLibroDto(libro)).willReturn(new LibroDto(libro.getCodigo(), libro.getTitulo(),libro.getAutor(),libro.getPrecio(), libro.getEditorial(), libro.getContacto(), libro.getStock(), libro.getDescartado()));
 
         mvc.perform(get("/libros/{id}","uno")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -77,8 +77,8 @@ public class LibroControllerTest {
         List<Libro> encontrados = List.of(libro1,libro2);
 
         given(libroService.getLibrosPorBusquedaGral(anyString())).willReturn(encontrados);
-        given(mapper.libroToLibroDto(libro1)).willReturn(new LibroDto(libro1.getId(), libro1.getTitulo(),libro1.getAutor(),libro1.getPrecio(), libro1.getEditorial(), libro1.getContacto(), libro1.getStock(), libro1.getDescartado()));
-        given(mapper.libroToLibroDto(libro2)).willReturn(new LibroDto(libro2.getId(), libro2.getTitulo(),libro2.getAutor(),libro2.getPrecio(), libro2.getEditorial(), libro2.getContacto(), libro2.getStock(), libro2.getDescartado()));
+        given(mapper.libroToLibroDto(libro1)).willReturn(new LibroDto(libro1.getCodigo(), libro1.getTitulo(),libro1.getAutor(),libro1.getPrecio(), libro1.getEditorial(), libro1.getContacto(), libro1.getStock(), libro1.getDescartado()));
+        given(mapper.libroToLibroDto(libro2)).willReturn(new LibroDto(libro2.getCodigo(), libro2.getTitulo(),libro2.getAutor(),libro2.getPrecio(), libro2.getEditorial(), libro2.getContacto(), libro2.getStock(), libro2.getDescartado()));
 
         mvc.perform(get("/libros")
                         .queryParam("keyword","anillos")
@@ -98,8 +98,8 @@ public class LibroControllerTest {
         List<Libro> encontrados = List.of(libro1,libro2);
 
         given(libroService.getLibrosPorBusquedaAvz(anyString(),anyString())).willReturn(encontrados);
-        given(mapper.libroToLibroDto(libro1)).willReturn(new LibroDto(libro1.getId(), libro1.getTitulo(),libro1.getAutor(),libro1.getPrecio(), libro1.getEditorial(), libro1.getContacto(), libro1.getStock(), libro1.getDescartado()));
-        given(mapper.libroToLibroDto(libro2)).willReturn(new LibroDto(libro2.getId(), libro2.getTitulo(),libro2.getAutor(),libro2.getPrecio(), libro2.getEditorial(), libro2.getContacto(), libro2.getStock(), libro2.getDescartado()));
+        given(mapper.libroToLibroDto(libro1)).willReturn(new LibroDto(libro1.getCodigo(), libro1.getTitulo(),libro1.getAutor(),libro1.getPrecio(), libro1.getEditorial(), libro1.getContacto(), libro1.getStock(), libro1.getDescartado()));
+        given(mapper.libroToLibroDto(libro2)).willReturn(new LibroDto(libro2.getCodigo(), libro2.getTitulo(),libro2.getAutor(),libro2.getPrecio(), libro2.getEditorial(), libro2.getContacto(), libro2.getStock(), libro2.getDescartado()));
 
         mvc.perform(get("/libros")
                         .queryParam("keyword","anillos")

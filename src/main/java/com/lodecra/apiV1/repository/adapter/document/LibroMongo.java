@@ -1,24 +1,7 @@
 package com.lodecra.apiV1.repository.adapter.document;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Data
 @Document(value = "libroscollection")
-public class LibroMongo {
-
-    @Id
-    private String id;
-    @Field
-    private String titulo, autor;
-    @Field
-    private Integer precio;
-    @Field
-    private String editorial, contacto;
-    @Field
-    private Integer stock;
-    @Field
-    private Boolean descartado;
-}
+public record LibroMongo (@Field String codigo, @Field String titulo, @Field String autor, @Field Integer precio, @Field String editorial, @Field String contacto, @Field Integer stock, @Field Boolean descartado) {}

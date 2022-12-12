@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController("/lodecra/api/2.0")
 @Slf4j
 public class LibroController {
 
