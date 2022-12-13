@@ -17,10 +17,12 @@ public interface LibroMapper {
     @Mapping(target = "price", source = "precio", defaultValue = "0")
     @Mapping(target = "publisher", source = "editorial", defaultValue = "N/A")
     @Mapping(target = "contact", source = "contacto", defaultValue = "N/A")
-    @Mapping(target = "stock", source = "stock", defaultValue = "0")
+    @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "discarded", source = "descartado", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     LibroDto libroToLibroDto(Libro libro);
 
+    @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "descartado", source = "descartado", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     Libro libroMongoToLibro(LibroMongo libroMongo);
+
 }
