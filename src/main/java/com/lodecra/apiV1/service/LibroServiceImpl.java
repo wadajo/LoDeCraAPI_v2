@@ -23,12 +23,12 @@ public class LibroServiceImpl implements LibroService {
 
     @Override
     public List<Libro> getLibrosPorBusquedaGral(String keyword) {
-        return null;
+        return repository.obtenerLibrosPorBusquedaGeneral(keyword);
     }
 
     @Override
     public List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
-        return null;
+        return repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
     }
 
     @Override

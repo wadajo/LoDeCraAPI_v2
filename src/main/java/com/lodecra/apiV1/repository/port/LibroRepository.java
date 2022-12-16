@@ -7,4 +7,7 @@ import java.util.List;
 public interface LibroRepository {
 
     List<Libro> obtenerTodosLosLibros();
+    List<Libro> obtenerLibrosPorBusquedaGeneral(String keyword);
+
+    List<Libro> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar);
 }
