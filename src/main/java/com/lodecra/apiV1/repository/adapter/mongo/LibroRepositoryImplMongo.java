@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Primary
@@ -36,6 +37,12 @@ public class LibroRepositoryImplMongo implements LibroRepository {
     public List<Libro> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var librosEncontrados = filtrarLibrosPorKeywordAvz(keyword,campoABuscar,mongoRepository.findAll());
         return convertirListaLibrosMongoALibros(librosEncontrados);
+    }
+
+    @Override
+    public Optional<Libro> obtenerLibroPorCodigo(String codigo) {
+        var aDevolver = mongoRepository.findByCodigo(codigo);
+        return aDevolver.map(mapper::libroMongoToLibro);
     }
 
     private List<Libro> convertirListaLibrosMongoALibros(List<LibroMongo> original){

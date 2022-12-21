@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -58,7 +59,7 @@ public class LibroControllerTest {
         Libro libro = new Libro("55_EmaAi","Ema, la cautiva","Aira",990,"EUDEBA",null,1,false);
         libro.setTitulo("unico");
 
-        given(libroService.getLibroPorId(anyString())).willReturn(libro);
+        given(libroService.getLibroPorCodigo(anyString())).willReturn(Optional.of(libro));
         given(mapper.libroToLibroDto(libro)).willReturn(new LibroDto(libro.getCodigo(), libro.getTitulo(),libro.getAutor(),libro.getPrecio(), libro.getEditorial(), libro.getContacto(), libro.getStock(), libro.getDescartado()));
 
         mvc.perform(get("/libros/{id}","uno")
