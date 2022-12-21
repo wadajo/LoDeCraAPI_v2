@@ -1,11 +1,15 @@
 package com.lodecra.apiV1.service;
 
+import com.lodecra.apiV1.exception.BookNotFoundException;
+import com.lodecra.apiV1.exception.EmptySearchException;
+import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.service.port.LibroService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LibroServiceImpl implements LibroService {
@@ -18,22 +22,45 @@ public class LibroServiceImpl implements LibroService {
 
     @Override
     public List<Libro> getLibros() {
-        return repository.obtenerTodosLosLibros();
+        var encontrados=repository.obtenerTodosLosLibros();
+        if (encontrados.isEmpty()){
+            throw new EmptySearchException();
+        } else {
+            return encontrados;
+        }
     }
 
     @Override
     public List<Libro> getLibrosPorBusquedaGral(String keyword) {
-        return repository.obtenerLibrosPorBusquedaGeneral(keyword);
+        var encontrados=repository.obtenerLibrosPorBusquedaGeneral(keyword);
+        if (encontrados.isEmpty()){
+            throw new EmptySearchException();
+        } else {
+            return encontrados;
+        }
     }
 
     @Override
     public List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
-        return repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
+        var encontrados=repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
+        if (encontrados.isEmpty()){
+            throw new EmptySearchException();
+        } else {
+            return encontrados;
+        }
     }
 
     @Override
-    public Libro getLibroPorId(String id) {
-        return null;
+    public Optional<Libro> getLibroPorCodigo(String codigo) {
+        if (codigo.length()!=8) {
+            throw new WrongIdFormatException(codigo);
+        } else {
+            Optional<Libro> encontrado=repository.obtenerLibroPorCodigo(codigo);
+            if (encontrado.isPresent())
+                return encontrado;
+            else
+                throw new BookNotFoundException(codigo);
+        }
     }
 
     @Override
