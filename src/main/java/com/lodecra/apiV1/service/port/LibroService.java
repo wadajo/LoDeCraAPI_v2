@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface LibroService {
 
-    List<Libro> getLibros() throws EmptySearchException;
-    List<Libro> getLibrosPorBusquedaGral(String keyword) throws EmptySearchException;
-    List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) throws EmptySearchException;
+    Optional<List<Libro>> getLibros() throws EmptySearchException;
+    Optional<List<Libro>> getLibrosPorBusquedaGral(String keyword) throws EmptySearchException;
+    Optional<List<Libro>> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) throws EmptySearchException;
     Optional<Libro> getLibroPorCodigo (String codigo) throws WrongIdFormatException, BookNotFoundException;
     Boolean existeLibroConMismoCodigo(String id);
 }

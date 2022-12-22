@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface LibroRepository {
 
-    List<Libro> obtenerTodosLosLibros();
-    List<Libro> obtenerLibrosPorBusquedaGeneral(String keyword);
-    List<Libro> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar);
+    Optional<List<Libro>> obtenerTodosLosLibros();
+    Optional<List<Libro>> obtenerLibrosPorBusquedaGeneral(String keyword);
+    Optional<List<Libro>> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar);
 
     Optional<Libro> obtenerLibroPorCodigo(String codigo);
 }

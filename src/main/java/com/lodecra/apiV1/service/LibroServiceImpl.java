@@ -21,7 +21,7 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public List<Libro> getLibros() {
+    public Optional<List<Libro>> getLibros() {
         var encontrados=repository.obtenerTodosLosLibros();
         if (encontrados.isEmpty()){
             throw new EmptySearchException();
@@ -31,7 +31,7 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public List<Libro> getLibrosPorBusquedaGral(String keyword) {
+    public Optional<List<Libro>> getLibrosPorBusquedaGral(String keyword) {
         var encontrados=repository.obtenerLibrosPorBusquedaGeneral(keyword);
         if (encontrados.isEmpty()){
             throw new EmptySearchException();
@@ -41,7 +41,7 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
+    public Optional<List<Libro>> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var encontrados=repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
         if (encontrados.isEmpty()){
             throw new EmptySearchException();

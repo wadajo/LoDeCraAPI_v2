@@ -22,21 +22,21 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         this.mapper = mapper;
     }
     @Override
-    public List<Libro> obtenerTodosLosLibros(){
+    public Optional<List<Libro>> obtenerTodosLosLibros(){
         var todosLosLibrosMongo = mongoRepository.findAll();
-        return convertirListaLibrosMongoALibros(todosLosLibrosMongo);
+        return conContenidoOVacio(todosLosLibrosMongo);
     }
 
     @Override
-    public List<Libro> obtenerLibrosPorBusquedaGeneral(String keyword) {
+    public Optional<List<Libro>> obtenerLibrosPorBusquedaGeneral(String keyword) {
         var librosEncontrados = filtrarLibrosPorKeywordGeneral(keyword, mongoRepository.findAll());
-        return convertirListaLibrosMongoALibros(librosEncontrados);
+        return conContenidoOVacio(librosEncontrados);
     }
 
     @Override
-    public List<Libro> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
+    public Optional<List<Libro>> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var librosEncontrados = filtrarLibrosPorKeywordAvz(keyword,campoABuscar,mongoRepository.findAll());
-        return convertirListaLibrosMongoALibros(librosEncontrados);
+        return conContenidoOVacio(librosEncontrados);
     }
 
     @Override
@@ -79,5 +79,11 @@ public class LibroRepositoryImplMongo implements LibroRepository {
             default:
                 yield false;
         }).toList();
+    }
+
+    private Optional<List<Libro>> conContenidoOVacio(List<LibroMongo> librosMongo) {
+        return librosMongo.isEmpty() ?
+                Optional.empty() :
+                Optional.of(convertirListaLibrosMongoALibros(librosMongo));
     }
 }
