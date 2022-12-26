@@ -1,10 +1,12 @@
 package com.lodecra.apiV1;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lodecra.apiV1.controller.LibroController;
 import com.lodecra.apiV1.dto.LibroDto;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
+import com.lodecra.apiV1.util.Utilidades;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -114,5 +116,23 @@ public class LibroControllerTest {
                 .andExpect(jsonPath("$[0].name", is(libro1.getTitulo())));
     }
 
+    @Test
+    void cuandoGuardoUnLibroConDatosIncompletos_loGuardaYGeneraCorrectamenteElCodigo() throws Exception {
+        Libro libro1 = new Libro();
+        libro1.setTitulo("El divorcio");
+        libro1.setAutor("Aira");
+        libro1.setEditorial("Mansalva");
 
+        String libro1Json = new ObjectMapper().writeValueAsString(libro1);
+
+        given(libroService.guardarNuevoLibro(libro1)).willReturn(Optional.of(libro1));
+        given(mapper.libroToLibroDto(libro1)).willReturn(new LibroDto(Utilidades.construirCodigo(55,libro1.getTitulo(),libro1.getAutor()), libro1.getTitulo(),libro1.getAutor(),libro1.getPrecio(), libro1.getEditorial(), libro1.getContacto(), libro1.getStock(), libro1.getDescartado()));
+
+        mvc.perform(post(baseUrl+"/libros")
+                        .content(libro1Json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(libro1.getTitulo())))
+                .andExpect(jsonPath("$.code", is(Utilidades.construirCodigo(55,libro1.getTitulo(),libro1.getAutor()))));
+    }
 }
