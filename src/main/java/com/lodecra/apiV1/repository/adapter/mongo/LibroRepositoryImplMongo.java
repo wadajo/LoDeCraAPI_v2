@@ -1,6 +1,5 @@
 package com.lodecra.apiV1.repository.adapter.mongo;
 
-import com.lodecra.apiV1.exception.BookNotFoundException;
 import com.lodecra.apiV1.exception.BookNotSavedException;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
