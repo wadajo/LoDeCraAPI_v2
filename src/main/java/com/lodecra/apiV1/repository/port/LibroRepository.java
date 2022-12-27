@@ -1,6 +1,5 @@
 package com.lodecra.apiV1.repository.port;
 
-import com.lodecra.apiV1.dto.LibroDto;
 import com.lodecra.apiV1.exception.BookNotSavedException;
 import com.lodecra.apiV1.model.Libro;
 
@@ -20,4 +19,6 @@ public interface LibroRepository {
     Optional<Libro> crearNuevoLibro(Libro nuevo) throws BookNotSavedException;
 
     Optional<Libro> buscarLibroPorTituloYAutor(String titulo, String autor);
+
+    Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo);
 }

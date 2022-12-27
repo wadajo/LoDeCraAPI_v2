@@ -19,4 +19,6 @@ public interface LibroService {
     Optional<Libro> guardarNuevoLibro (Libro aGuardar) throws BookNotSavedException, DuplicatedBookException;
 
     boolean existeLibroConMismoTituloYAutor(String titulo, String autor);
+
+    Optional<Libro> editarLibro(Libro editadoSinCodigo, String codigo);
 }

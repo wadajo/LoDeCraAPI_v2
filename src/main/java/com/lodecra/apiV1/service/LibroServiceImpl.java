@@ -1,12 +1,9 @@
 package com.lodecra.apiV1.service;
 
-import com.lodecra.apiV1.dto.LibroDto;
 import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.service.port.LibroService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,5 +80,13 @@ public class LibroServiceImpl implements LibroService {
         var existenteEnLaBase=repository.buscarLibroPorTituloYAutor(titulo,autor);
         String existe=existenteEnLaBase.orElseGet(Libro::new).getTitulo();
         return null!=existe;
+    }
+
+    @Override
+    public Optional<Libro> editarLibro(Libro editadoSinCodigo, String codigo) {
+        if (existeLibroConMismoTituloYAutor(editadoSinCodigo.getTitulo(), editadoSinCodigo.getAutor()))
+            return repository.editarLibroExistente(editadoSinCodigo,codigo);
+        else
+            throw new BookNotFoundException(editadoSinCodigo.getCodigo());
     }
 }

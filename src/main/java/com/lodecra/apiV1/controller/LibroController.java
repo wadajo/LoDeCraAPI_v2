@@ -5,6 +5,7 @@ import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
+import com.lodecra.apiV1.util.Utilidades;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -85,6 +86,27 @@ public class LibroController {
             return ResponseEntity.status(HttpStatus.CREATED).body(aDevolver);
         } catch (BookNotSavedException | DuplicatedBookException e) {
             log.error("No se guardó el libro con título "+titulo+" y autor "+autor);
+            throw e;
+        }
+    }
+
+    @PutMapping("/libros/{codigo}")
+    public ResponseEntity<LibroDto> editarLibro(@RequestBody Libro editado, @PathVariable String codigo) {
+        String titulo = editado.getTitulo();
+        String autor = editado.getAutor();
+        log.info("Llamando a PUT /libros con libro de Título "+titulo+" y Autor "+autor+".");
+        try {
+            var existeLibro = libroService.getLibroPorCodigo(codigo).isPresent();
+            if(existeLibro) {
+                var guardado = libroService.editarLibro(editado,codigo);
+                LibroDto aDevolver = mapper.libroToLibroDto(guardado.orElseThrow(()-> new BookNotFoundException(codigo)));
+                log.info("Actualizado libro. Título: " + titulo + ". Autor: " + autor + ". Código: " + aDevolver.code());
+                return ResponseEntity.ok(aDevolver);
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
+        } catch (BookNotFoundException e) {
+            log.error("No se encontró el libro con título "+titulo+" y autor "+autor+" en la Base, con el código "+codigo);
             throw e;
         }
     }

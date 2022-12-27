@@ -6,7 +6,9 @@ import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.adapter.document.LibroMongo;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.util.Utilidades;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,15 +16,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
 @Repository
 @Primary
 public class LibroRepositoryImplMongo implements LibroRepository {
     private final LibroMongoRepository mongoRepository;
     private final LibroMapper mapper;
+    private final MongoTemplate mongoTemplate;
 
-    public LibroRepositoryImplMongo(LibroMongoRepository mongoRepository, LibroMapper mapper) {
+    @Value("${spring.data.mongodb.collection}")
+    private String collectionName;
+
+    public LibroRepositoryImplMongo(LibroMongoRepository mongoRepository, LibroMapper mapper, MongoTemplate mongoTemplate) {
         this.mongoRepository = mongoRepository;
         this.mapper = mapper;
+        this.mongoTemplate = mongoTemplate;
     }
     @Transactional(readOnly = true)
     @Override
@@ -77,6 +87,20 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         if(posible.isPresent()) {
             var encontrado = posible.get();
             return Optional.of(mapper.libroMongoToLibro(encontrado));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo) {
+        if(mongoRepository.findByCodigo(codigo).isPresent()) {
+            mongoTemplate
+                    .update(LibroMongo.class)
+                    .matching(query(where("codigo").is(codigo)))
+                    .replaceWith(mapper.libroToLibroMongo(editadoSinCodigo))
+                    .findAndReplace();
+            return Optional.of(mapper.libroMongoToLibro(mongoRepository.findByCodigo(codigo).orElseThrow(()-> new BookNotSavedException(editadoSinCodigo.getTitulo()))));
         } else {
             return Optional.empty();
         }
