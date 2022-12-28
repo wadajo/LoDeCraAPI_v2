@@ -21,4 +21,6 @@ public interface LibroRepository {
     Optional<Libro> buscarLibroPorTituloYAutor(String titulo, String autor);
 
     Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo);
+
+    void descartarLibro(String codigo);
 }

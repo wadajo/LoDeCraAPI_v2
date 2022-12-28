@@ -5,16 +5,12 @@ import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
-import com.lodecra.apiV1.util.Utilidades;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -106,6 +102,31 @@ public class LibroController {
             }
         } catch (BookNotFoundException e) {
             log.error("No se encontró el libro con el código "+codigo);
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/libros/{codigo}")
+    public ResponseEntity<LibroDto> borrarLibro(@PathVariable String codigo) {
+        log.info("Llamando a DELETE /libros/{codigo} con libro de código "+codigo);
+        try {
+            var libroExistente = libroService.getLibroPorCodigo(codigo);
+            if(libroExistente.isPresent() && (null==libroExistente.get().getDescartado() || !libroExistente.get().getDescartado())) {
+                log.info("Encontrado en la Base. Título: "+libroExistente.get().getTitulo());
+                libroService.descartarLibro(codigo);
+                LibroDto aDevolver = mapper.libroToLibroDto(libroService.getLibroPorCodigo(codigo).orElseThrow(()-> new BookNotFoundException(codigo)));
+                log.info("Descartado libro. Título: " + aDevolver.name() + ". Autor: " + aDevolver.author() + ". Código: " + codigo);
+                return ResponseEntity.ok(aDevolver);
+            } else if (libroExistente.isPresent() && libroExistente.get().getDescartado()) {
+                throw new BookAlreadyDiscardedException(libroExistente.get().getTitulo());
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
+        } catch (BookNotFoundException e) {
+            log.error("No se encontró el libro con el código "+codigo);
+            throw e;
+        } catch (BookAlreadyDiscardedException e) {
+            log.error("El libro de código "+codigo+" ya está descartado.");
             throw e;
         }
     }

@@ -98,7 +98,7 @@ public class LibroRepositoryImplMongo implements LibroRepository {
     public Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo) {
         Optional<Libro> aDevolver = Optional.empty();
         if(mongoRepository.findByCodigo(codigo).isPresent()) {
-            LibroMongo nuevo = construirLibroEditado(editadoSinCodigo, codigo);
+            LibroMongo nuevo = construirLibroMongoEditado(editadoSinCodigo, codigo);
             mongoTemplate
                     .update(LibroMongo.class)
                     .matching(query(where("codigo").is(codigo)))
@@ -109,7 +109,33 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         return aDevolver;
     }
 
-    private LibroMongo construirLibroEditado(Libro editadoSinCodigo, String codigo) {
+    @Transactional
+    @Override
+    public void descartarLibro(String codigo) {
+        var aDevolverOptional = mongoRepository.findByCodigo(codigo);
+        if(aDevolverOptional.isPresent()) {
+            var aDevolverSinDescartar = aDevolverOptional.get();
+            LibroMongo descartado = construirLibroMongoADescartar(aDevolverSinDescartar);
+            mongoTemplate
+                    .update(LibroMongo.class)
+                    .matching(query(where("codigo").is(codigo)))
+                    .replaceWith(descartado)
+                    .findAndReplace();
+        }
+    }
+
+    private LibroMongo construirLibroMongoADescartar(LibroMongo aDevolverSinDescartar) {
+        return new LibroMongo(aDevolverSinDescartar.codigo(),
+                aDevolverSinDescartar.titulo(),
+                aDevolverSinDescartar.autor(),
+                aDevolverSinDescartar.precio(),
+                aDevolverSinDescartar.editorial(),
+                aDevolverSinDescartar.contacto(),
+                aDevolverSinDescartar.stock(),
+                Boolean.TRUE);
+    }
+
+    private LibroMongo construirLibroMongoEditado(Libro editadoSinCodigo, String codigo) {
         return new LibroMongo(codigo,
                 null!= editadoSinCodigo.getTitulo() ? editadoSinCodigo.getTitulo() : mongoRepository.findByCodigo(codigo).orElseThrow().titulo(),
                 null!= editadoSinCodigo.getAutor() ? editadoSinCodigo.getAutor() : mongoRepository.findByCodigo(codigo).orElseThrow().autor(),

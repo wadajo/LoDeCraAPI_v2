@@ -21,4 +21,6 @@ public interface LibroService {
     boolean existeLibroConMismoTituloYAutor(String titulo, String autor);
 
     Optional<Libro> editarLibro(Libro editadoSinCodigo, String codigo);
+
+    void descartarLibro(String codigo);
 }

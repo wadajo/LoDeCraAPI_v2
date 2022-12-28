@@ -89,6 +89,15 @@ public class LibroServiceImpl implements LibroService {
         if (getLibroPorCodigo(codigo).isPresent())
             return repository.editarLibroExistente(editadoSinCodigo,codigo);
         else
-            throw new BookNotFoundException(editadoSinCodigo.getCodigo());
+            throw new BookNotFoundException(codigo);
+    }
+
+    @Transactional
+    @Override
+    public void descartarLibro(String codigo) {
+        if (getLibroPorCodigo(codigo).isPresent())
+            repository.descartarLibro(codigo);
+        else
+            throw new BookNotFoundException(codigo);
     }
 }
