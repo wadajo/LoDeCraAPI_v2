@@ -78,6 +78,7 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         return Optional.of(mapper.libroMongoToLibro(mongoRepository.findByCodigo(creado.codigo()).orElseThrow(()-> new BookNotSavedException(nuevo.getTitulo()))));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Libro> buscarLibroPorTituloYAutor(String titulo, String autor) {
         var todosLosLibrosMongo = mongoRepository.findAll();
@@ -92,18 +93,31 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         }
     }
 
+    @Transactional
     @Override
     public Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo) {
+        Optional<Libro> aDevolver = Optional.empty();
         if(mongoRepository.findByCodigo(codigo).isPresent()) {
+            LibroMongo nuevo = construirLibroEditado(editadoSinCodigo, codigo);
             mongoTemplate
                     .update(LibroMongo.class)
                     .matching(query(where("codigo").is(codigo)))
-                    .replaceWith(mapper.libroToLibroMongo(editadoSinCodigo))
+                    .replaceWith(nuevo)
                     .findAndReplace();
-            return Optional.of(mapper.libroMongoToLibro(mongoRepository.findByCodigo(codigo).orElseThrow(()-> new BookNotSavedException(editadoSinCodigo.getTitulo()))));
-        } else {
-            return Optional.empty();
+            aDevolver = Optional.of(mapper.libroMongoToLibro(nuevo));
         }
+        return aDevolver;
+    }
+
+    private LibroMongo construirLibroEditado(Libro editadoSinCodigo, String codigo) {
+        return new LibroMongo(codigo,
+                null!= editadoSinCodigo.getTitulo() ? editadoSinCodigo.getTitulo() : mongoRepository.findByCodigo(codigo).orElseThrow().titulo(),
+                null!= editadoSinCodigo.getAutor() ? editadoSinCodigo.getAutor() : mongoRepository.findByCodigo(codigo).orElseThrow().autor(),
+                null!= editadoSinCodigo.getPrecio() ? editadoSinCodigo.getPrecio() : mongoRepository.findByCodigo(codigo).orElseThrow().precio(),
+                null!= editadoSinCodigo.getEditorial() ? editadoSinCodigo.getEditorial() : mongoRepository.findByCodigo(codigo).orElseThrow().editorial(),
+                null!= editadoSinCodigo.getContacto() ? editadoSinCodigo.getContacto() : mongoRepository.findByCodigo(codigo).orElseThrow().contacto(),
+                null!= editadoSinCodigo.getStock() ? editadoSinCodigo.getStock() : mongoRepository.findByCodigo(codigo).orElseThrow().stock(),
+                null!= editadoSinCodigo.getDescartado() ? editadoSinCodigo.getDescartado() : mongoRepository.findByCodigo(codigo).orElseThrow().descartado());
     }
 
     private List<Libro> convertirListaLibrosMongoALibros(List<LibroMongo> original){

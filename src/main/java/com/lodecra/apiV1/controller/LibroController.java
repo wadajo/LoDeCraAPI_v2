@@ -92,21 +92,20 @@ public class LibroController {
 
     @PutMapping("/libros/{codigo}")
     public ResponseEntity<LibroDto> editarLibro(@RequestBody Libro editado, @PathVariable String codigo) {
-        String titulo = editado.getTitulo();
-        String autor = editado.getAutor();
-        log.info("Llamando a PUT /libros con libro de Título "+titulo+" y Autor "+autor+".");
+        log.info("Llamando a PUT /libros/{codigo} con libro de código "+codigo);
         try {
-            var existeLibro = libroService.getLibroPorCodigo(codigo).isPresent();
-            if(existeLibro) {
+            var libroExistente = libroService.getLibroPorCodigo(codigo);
+            if(libroExistente.isPresent()) {
+                log.info("Encontrado en la Base. Título: "+libroExistente.get().getTitulo());
                 var guardado = libroService.editarLibro(editado,codigo);
                 LibroDto aDevolver = mapper.libroToLibroDto(guardado.orElseThrow(()-> new BookNotFoundException(codigo)));
-                log.info("Actualizado libro. Título: " + titulo + ". Autor: " + autor + ". Código: " + aDevolver.code());
+                log.info("Actualizado libro. Título: " + aDevolver.name() + ". Autor: " + aDevolver.author() + ". Código: " + codigo);
                 return ResponseEntity.ok(aDevolver);
             } else {
                 return ResponseEntity.internalServerError().build();
             }
         } catch (BookNotFoundException e) {
-            log.error("No se encontró el libro con título "+titulo+" y autor "+autor+" en la Base, con el código "+codigo);
+            log.error("No se encontró el libro con el código "+codigo);
             throw e;
         }
     }

@@ -75,6 +75,7 @@ public class LibroServiceImpl implements LibroService {
             throw new DuplicatedBookException(aGuardar.getTitulo(), aGuardar.getAutor());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean existeLibroConMismoTituloYAutor(String titulo, String autor) {
         var existenteEnLaBase=repository.buscarLibroPorTituloYAutor(titulo,autor);
@@ -82,9 +83,10 @@ public class LibroServiceImpl implements LibroService {
         return null!=existe;
     }
 
+    @Transactional
     @Override
     public Optional<Libro> editarLibro(Libro editadoSinCodigo, String codigo) {
-        if (existeLibroConMismoTituloYAutor(editadoSinCodigo.getTitulo(), editadoSinCodigo.getAutor()))
+        if (getLibroPorCodigo(codigo).isPresent())
             return repository.editarLibroExistente(editadoSinCodigo,codigo);
         else
             throw new BookNotFoundException(editadoSinCodigo.getCodigo());
