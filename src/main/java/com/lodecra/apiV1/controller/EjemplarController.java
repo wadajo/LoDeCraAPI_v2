@@ -1,16 +1,12 @@
 package com.lodecra.apiV1.controller;
 
 import com.lodecra.apiV1.dto.EjemplarDto;
-import com.lodecra.apiV1.dto.LibroDto;
 import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.mapstruct.mappers.EjemplarMapper;
-import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Ejemplar;
-import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.EjemplarService;
 import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +22,13 @@ public class EjemplarController {
 
     private final EjemplarService ejemplarService;
 
+    private final LibroService libroService;
+
     private final EjemplarMapper mapper;
 
-    public EjemplarController(EjemplarService ejemplarService, EjemplarMapper mapper) {
+    public EjemplarController(EjemplarService ejemplarService, LibroService libroService, EjemplarMapper mapper) {
         this.ejemplarService = ejemplarService;
+        this.libroService = libroService;
         this.mapper = mapper;
     }
 
@@ -39,9 +38,14 @@ public class EjemplarController {
         Optional<List<Ejemplar>> aDevolverOptional;
         List<EjemplarDto> aDevolver=new ArrayList<>();
         try {
+            var libroBuscado = libroService.getLibroPorCodigo(codLibro);
             aDevolverOptional = ejemplarService.getEjemplaresPorCodigoLibro(codLibro);
             log.info("Encontrados "+aDevolverOptional.orElseGet(Collections::emptyList).size()+" ejemplares de este libro.");
-            aDevolverOptional.ifPresent(lista->lista.forEach(ejemplar -> aDevolver.add(mapper.ejemplarToEjemplarDto(ejemplar))));
+            if(aDevolverOptional.isPresent() && libroBuscado.isPresent()){
+                var listaDeEjemplares=aDevolverOptional.get();
+                var libroCorrespondiente=libroBuscado.get();
+                listaDeEjemplares.forEach(ejemplar -> aDevolver.add(mapper.ejemplarAndLibroToEjemplarDto(ejemplar,libroCorrespondiente)));
+            }
         } catch (WrongIdFormatException e) {
             log.error("El código "+codLibro+" tiene un formato erróneo");
             throw e;
