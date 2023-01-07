@@ -117,7 +117,7 @@ public class LibroController {
                 LibroDto aDevolver = mapper.libroToLibroDto(libroService.getLibroPorCodigo(codigo).orElseThrow(()-> new BookNotFoundException(codigo)));
                 log.info("Descartado libro. Título: " + aDevolver.name() + ". Autor: " + aDevolver.author() + ". Código: " + codigo);
                 return ResponseEntity.ok(aDevolver);
-            } else if (libroExistente.isPresent() && libroExistente.get().getDescartado()) {
+            } else if (libroExistente.isPresent()) {
                 throw new BookAlreadyDiscardedException(libroExistente.get().getTitulo());
             } else {
                 return ResponseEntity.internalServerError().build();

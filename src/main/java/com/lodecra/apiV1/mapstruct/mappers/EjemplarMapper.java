@@ -23,7 +23,7 @@ public interface EjemplarMapper {
     @Mapping(target = "volumeNum", source = "ejemplar.nroEjemplar")
     @Mapping(target = "location", source = "ejemplar.ubicacion")
     @Mapping(target = "modality", source = "ejemplar.modalidad")
-    @Mapping(target = "added", source = "ejemplar.agregado")
+    @Mapping(target = "added", expression = "java(java.time.LocalDateTime.parse(ejemplar.getAgregado().toString(), java.time.format.DateTimeFormatter.ISO_DATE_TIME).format(java.time.format.DateTimeFormatter.ofPattern(\"dd-MM-yy HH:mm\")))")
     EjemplarDto ejemplarAndLibroToEjemplarDto(Ejemplar ejemplar, Libro libro);
 
     @Mapping(target = "libro.codigo", source = "codLibro")
