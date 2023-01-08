@@ -1,10 +1,12 @@
 package com.lodecra.apiV1.repository.adapter.mongo;
 
+import com.lodecra.apiV1.exception.BookNotSavedException;
 import com.lodecra.apiV1.mapstruct.mappers.EjemplarMapper;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         this.mapper = mapper;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<List<Ejemplar>> obtenerEjemplaresPorCodigoDeLibro(String codLibro) {
         var todosLosEjemplares=mongoRepository.findAllByCodLibro(codLibro);
@@ -30,5 +33,13 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         return listaEjemplar.isEmpty() ?
                 Optional.empty() :
                 Optional.of(listaEjemplar);
+    }
+
+    @Transactional
+    @Override
+    public Ejemplar agregarEjemplar(Ejemplar nuevo) {
+        var agregado=mongoRepository.save(mapper.ejemplarToEjemplarMongo(nuevo));
+        var encontrado=mongoRepository.findByCodLibroAndNroEjemplar(agregado.codLibro(),agregado.nroEjemplar());
+        return mapper.ejemplarMongoToEjemplar(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())));
     }
 }

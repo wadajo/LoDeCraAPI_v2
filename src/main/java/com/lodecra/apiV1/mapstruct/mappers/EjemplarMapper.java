@@ -12,7 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface EjemplarMapper {
 
-    @Mapping(target = "book.code", source = "libro.codigo")
+    @Mapping(target = "book.code", ignore = true)
     @Mapping(target = "book.name", source = "libro.titulo")
     @Mapping(target = "book.author", source = "libro.autor")
     @Mapping(target = "book.price", source = "libro.precio", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
@@ -28,5 +28,8 @@ public interface EjemplarMapper {
 
     @Mapping(target = "libro.codigo", source = "codLibro")
     Ejemplar ejemplarMongoToEjemplar(EjemplarMongo ejemplarMongo);
+
+    @Mapping(source = "libro.codigo", target = "codLibro")
+    EjemplarMongo ejemplarToEjemplarMongo(Ejemplar ejemplar);
 
 }
