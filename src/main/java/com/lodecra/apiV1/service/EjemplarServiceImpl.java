@@ -2,6 +2,7 @@ package com.lodecra.apiV1.service;
 
 import com.lodecra.apiV1.exception.BookNotFoundException;
 import com.lodecra.apiV1.exception.BookNotSavedException;
+import com.lodecra.apiV1.exception.NoExistencesFoundException;
 import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
@@ -39,7 +40,7 @@ public class EjemplarServiceImpl implements EjemplarService {
             if (encontrados.isPresent() && !encontrados.get().isEmpty())
                 return encontrados;
             else
-                throw new BookNotFoundException(codLibro);
+                throw new NoExistencesFoundException(codLibro);
         }
     }
 
