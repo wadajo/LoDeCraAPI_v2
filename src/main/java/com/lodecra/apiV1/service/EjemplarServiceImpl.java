@@ -1,9 +1,6 @@
 package com.lodecra.apiV1.service;
 
-import com.lodecra.apiV1.exception.BookNotFoundException;
-import com.lodecra.apiV1.exception.BookNotSavedException;
-import com.lodecra.apiV1.exception.NoExistencesFoundException;
-import com.lodecra.apiV1.exception.WrongIdFormatException;
+import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
 import com.lodecra.apiV1.repository.port.LibroRepository;
@@ -42,6 +39,15 @@ public class EjemplarServiceImpl implements EjemplarService {
             else
                 throw new NoExistencesFoundException(codLibro);
         }
+    }
+
+    @Override
+    public Optional<Ejemplar> getEjemplarNro(String codLibro, Integer nroEjemplar) throws WrongVolumeNoException {
+        var ejemplarEncontrado=ejemplarRepository.obtenerEjemplarNro(codLibro, nroEjemplar);
+        if (ejemplarEncontrado.isPresent())
+            return ejemplarEncontrado;
+        else
+            throw new WrongVolumeNoException(codLibro,nroEjemplar);
     }
 
     @Transactional

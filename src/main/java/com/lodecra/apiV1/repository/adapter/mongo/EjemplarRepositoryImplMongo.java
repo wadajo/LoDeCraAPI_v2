@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Repository
 @Primary
 public class EjemplarRepositoryImplMongo implements EjemplarRepository {
@@ -23,7 +24,6 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         this.mapper = mapper;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Ejemplar>> obtenerEjemplaresPorCodigoDeLibro(String codLibro) {
         var todosLosEjemplares=mongoRepository.findAllByCodLibro(codLibro);
@@ -33,6 +33,15 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         return listaEjemplar.isEmpty() ?
                 Optional.empty() :
                 Optional.of(listaEjemplar);
+    }
+
+    @Override
+    public Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer numEjemplar) {
+        Ejemplar encontrado=null;
+        var ejemplarADevolver=mongoRepository.findByCodLibroAndNroEjemplar(codLibro, numEjemplar);
+        if (ejemplarADevolver.isPresent())
+            encontrado=mapper.ejemplarMongoToEjemplar(ejemplarADevolver.get());
+        return Optional.ofNullable(encontrado);
     }
 
     @Transactional

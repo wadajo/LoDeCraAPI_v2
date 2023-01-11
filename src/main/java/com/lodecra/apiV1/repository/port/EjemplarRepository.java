@@ -9,6 +9,8 @@ public interface EjemplarRepository {
 
     Optional<List<Ejemplar>> obtenerEjemplaresPorCodigoDeLibro(String codLibro);
 
+    Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer numEjemplar);
+
     Ejemplar agregarEjemplar(Ejemplar nuevo);
 
 }

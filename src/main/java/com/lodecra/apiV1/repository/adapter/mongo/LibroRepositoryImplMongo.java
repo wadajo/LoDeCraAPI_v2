@@ -19,6 +19,7 @@ import java.util.Optional;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+@Transactional(readOnly = true)
 @Repository
 @Primary
 public class LibroRepositoryImplMongo implements LibroRepository {
@@ -34,28 +35,24 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         this.mapper = mapper;
         this.mongoTemplate = mongoTemplate;
     }
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Libro>> obtenerTodosLosLibros(){
         var todosLosLibrosMongo = mongoRepository.findAll();
         return conContenidoOVacio(todosLosLibrosMongo);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Libro>> obtenerLibrosPorBusquedaGeneral(String keyword) {
         var librosEncontrados = filtrarLibrosPorKeywordGeneral(keyword, mongoRepository.findAll());
         return conContenidoOVacio(librosEncontrados);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Libro>> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var librosEncontrados = filtrarLibrosPorKeywordAvz(keyword,campoABuscar,mongoRepository.findAll());
         return conContenidoOVacio(librosEncontrados);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<Libro> obtenerLibroPorCodigo(String codigo) {
         var aDevolver = mongoRepository.findByCodigo(codigo);
@@ -78,7 +75,6 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         return Optional.of(mapper.libroMongoToLibro(mongoRepository.findByCodigo(creado.codigo()).orElseThrow(()-> new BookNotSavedException(nuevo.getTitulo()))));
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<Libro> buscarLibroPorTituloYAutor(String titulo, String autor) {
         var todosLosLibrosMongo = mongoRepository.findAll();
