@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Service
 public class LibroServiceImpl implements LibroService {
 
@@ -19,7 +20,6 @@ public class LibroServiceImpl implements LibroService {
         this.repository = repository;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Libro>> getLibros() {
         var encontrados=repository.obtenerTodosLosLibros();
@@ -30,7 +30,6 @@ public class LibroServiceImpl implements LibroService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Libro>> getLibrosPorBusquedaGral(String keyword) {
         var encontrados=repository.obtenerLibrosPorBusquedaGeneral(keyword);
@@ -41,7 +40,6 @@ public class LibroServiceImpl implements LibroService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Libro>> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var encontrados=repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
@@ -52,7 +50,6 @@ public class LibroServiceImpl implements LibroService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<Libro> getLibroPorCodigo(String codigo) {
         if (codigo.length()!=8) {
@@ -75,7 +72,6 @@ public class LibroServiceImpl implements LibroService {
             throw new DuplicatedBookException(aGuardar.getTitulo(), aGuardar.getAutor());
     }
 
-    @Transactional(readOnly = true)
     @Override
     public boolean existeLibroConMismoTituloYAutor(String titulo, String autor) {
         var existenteEnLaBase=repository.buscarLibroPorTituloYAutor(titulo,autor);

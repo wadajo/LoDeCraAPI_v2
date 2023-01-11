@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Transactional(readOnly = true)
 @Service
 public class EjemplarServiceImpl implements EjemplarService {
 
@@ -30,7 +31,6 @@ public class EjemplarServiceImpl implements EjemplarService {
         this.libroRepository = libroRepository;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<List<Ejemplar>> getEjemplaresPorCodigoLibro(String codLibro) throws WrongIdFormatException, BookNotFoundException {
         if (codLibro.length()!=8) {
@@ -54,7 +54,7 @@ public class EjemplarServiceImpl implements EjemplarService {
         var libro=libroRepository.obtenerLibroPorCodigo(codLibro);
         AtomicInteger cantEjemplares = new AtomicInteger (ejemplarRepository
                 .obtenerEjemplaresPorCodigoDeLibro(codLibro)
-                .orElseGet(ArrayList<Ejemplar>::new)
+                .orElseGet(ArrayList::new)
                 .size());
         if (libro.isPresent()) {
             construido.setLibro(libro.get());
