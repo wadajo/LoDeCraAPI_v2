@@ -36,9 +36,9 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
     }
 
     @Override
-    public Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer numEjemplar) {
+    public Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer nroEjemplar) {
         Ejemplar encontrado=null;
-        var ejemplarADevolver=mongoRepository.findByCodLibroAndNroEjemplar(codLibro, numEjemplar);
+        var ejemplarADevolver=mongoRepository.findByCodLibroAndNroEjemplar(codLibro, nroEjemplar);
         if (ejemplarADevolver.isPresent())
             encontrado=mapper.ejemplarMongoToEjemplar(ejemplarADevolver.get());
         return Optional.ofNullable(encontrado);
