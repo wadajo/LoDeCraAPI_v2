@@ -17,41 +17,41 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 @Primary
 public class VentaRepositoryImplMongo implements VentaRepository {
 
-    private final VentaMongoRepository repository;
+    private final EjemplarMongoRepository ejemplarRepository;
 
     private final VentaMapper mapper;
 
     private final MongoTemplate mongoTemplate;
 
-    public VentaRepositoryImplMongo(VentaMongoRepository repository, VentaMapper mapper, MongoTemplate mongoTemplate) {
-        this.repository = repository;
+    public VentaRepositoryImplMongo(EjemplarMongoRepository ejemplarRepository, VentaMapper mapper, MongoTemplate mongoTemplate) {
+        this.ejemplarRepository = ejemplarRepository;
         this.mapper = mapper;
         this.mongoTemplate = mongoTemplate;
     }
 
     @Transactional
     @Override
-    public void saveVenta(Venta venta) {
-        var ejemplarAVender=crearEjemplarVendido(venta);
+    public void saveVenta(Venta aGuardar) {
+        var ejemplarMongoAGuardar=mapper.ventaToEjemplarMongo(aGuardar);
         mongoTemplate
                 .update(EjemplarMongo.class)
-                .matching(query(where("nroEjemplar").is(ejemplarAVender.nroEjemplar())).addCriteria(where("codigo").is(ejemplarAVender.codLibro())))
-                .replaceWith(ejemplarAVender)
+                .matching(query(where("nroEjemplar").is(ejemplarMongoAGuardar.nroEjemplar())).addCriteria(where("codigo").is(ejemplarMongoAGuardar.codLibro())))
+                .replaceWith(ejemplarMongoAGuardar)
                 .findAndReplace();
-//        repository.save(ventaMongo);
+//        mongoTemplate.save(ejemplarMongoAGuardar,"ejemplarescollection");
     }
 
-    private EjemplarMongo crearEjemplarVendido(Venta venta){
-        return new EjemplarMongo(
-                venta.getEjemplarVendido().getLibro().getCodigo(),
-                venta.getEjemplarVendido().getNroEjemplar(),
-                venta.getEjemplarVendido().getUbicacion(),
-                venta.getEjemplarVendido().getModalidad(),
-                venta.getEjemplarVendido().getAgregado(),
-                venta.getFechaHoraVendido(),
-                venta.getPrecioVendido(),
-                Boolean.TRUE
-        );
+    @Override
+    public Venta obtenerVenta(String codLibro, Integer nroEjemplar) {
+        var ejemplarVendido=ejemplarRepository.findByCodLibroAndNroEjemplar(codLibro, nroEjemplar);
+        Venta aDevolver;
+        if (ejemplarVendido.isPresent()){
+            aDevolver=mapper.ejemplarMongoToVenta(ejemplarVendido.get());
+        } else {
+            aDevolver=new Venta();
+        }
+        return aDevolver;
     }
+
 
 }

@@ -4,6 +4,8 @@ import com.lodecra.apiV1.model.Venta;
 
 public interface VentaService {
 
-    void hacerVentaRapida (Venta aVenderAhora);
+    void hacerVentaRapida (String codLibro, Integer nroEjemplar);
+
+    Venta obtenerVenta(String codLibro, Integer nroEjemplar);
 
 }

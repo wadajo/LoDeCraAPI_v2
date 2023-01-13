@@ -37,4 +37,11 @@ public interface VentaMapper {
     @Mapping(target = "precioVendido", source = "venta.ejemplarVendido.libro.precio")
     EjemplarMongo ventaToEjemplarMongo(Venta venta);
 
+    @Mapping(source = "codLibro", target = "ejemplarVendido.libro.codigo")
+    @Mapping(source = "nroEjemplar", target = "ejemplarVendido.nroEjemplar")
+    @Mapping(source = "ubicacion", target = "ejemplarVendido.ubicacion")
+    @Mapping(source = "modalidad", target = "ejemplarVendido.modalidad")
+    @Mapping(source = "agregado", target = "ejemplarVendido.agregado")
+    @Mapping(source = "vendidoFecha", target = "fechaHoraVendido")
+    Venta ejemplarMongoToVenta(EjemplarMongo ejemplarMongo);
 }
