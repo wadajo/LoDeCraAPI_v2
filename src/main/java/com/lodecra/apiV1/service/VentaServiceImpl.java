@@ -1,7 +1,9 @@
 package com.lodecra.apiV1.service;
 
+import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Venta;
+import com.lodecra.apiV1.repository.port.EjemplarRepository;
 import com.lodecra.apiV1.repository.port.VentaRepository;
 import com.lodecra.apiV1.service.port.EjemplarService;
 import com.lodecra.apiV1.service.port.VentaService;
@@ -15,22 +17,30 @@ import java.time.ZoneId;
 @Service
 public class VentaServiceImpl implements VentaService {
 
-    private final VentaRepository ventaRepository;
-
     private final EjemplarService ejemplarService;
 
-    public VentaServiceImpl(VentaRepository ventaRepository, EjemplarService ejemplarService) {
-        this.ventaRepository = ventaRepository;
+    private final VentaRepository ventaRepository;
+
+    private final EjemplarRepository ejemplarRepository;
+
+    public VentaServiceImpl(EjemplarService ejemplarService, VentaRepository ventaRepository, EjemplarRepository ejemplarRepository) {
         this.ejemplarService = ejemplarService;
+        this.ventaRepository = ventaRepository;
+        this.ejemplarRepository = ejemplarRepository;
     }
 
 
     @Override
-    public void hacerVentaRapida(String codLibro, Integer nroEjemplar) {
-        ventaRepository.saveVenta(crearVentaAhora(codLibro, nroEjemplar));
+    public Venta hacerVentaRapida(String codLibro, Integer nroEjemplar) {
+        Venta aHacer=crearVentaAhora(codLibro, nroEjemplar);
+        ejemplarRepository.venderEjemplar(aHacer);
+        return aHacer;
     }
 
-    private Venta crearVentaAhora(String codLibro, Integer nroEjemplar) {
+    private Venta crearVentaAhora(String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException {
+        if (ventaRepository.estaVendido(codLibro, nroEjemplar))
+            throw new VolumeAlreadySoldException(codLibro,nroEjemplar);
+
         var ejemplarExistenteOptional=ejemplarService.getEjemplarNro(codLibro, nroEjemplar);
         Ejemplar ejemplarExistente=new Ejemplar();
         if (ejemplarExistenteOptional.isPresent()){
@@ -43,8 +53,5 @@ public class VentaServiceImpl implements VentaService {
         );
     }
 
-    @Override
-    public Venta obtenerVenta(String codLibro, Integer nroEjemplar) {
-        return ventaRepository.obtenerVenta(codLibro, nroEjemplar);
-    }
+
 }
