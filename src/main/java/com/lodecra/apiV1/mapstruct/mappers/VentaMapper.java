@@ -10,6 +10,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface VentaMapper {
 
+    @Mapping(target = "volume", source = "venta.ejemplarVendido")
     @Mapping(target = "volume.book.code", ignore = true)
     @Mapping(target = "volume.book.name", source = "venta.ejemplarVendido.libro.titulo")
     @Mapping(target = "volume.book.author", source = "venta.ejemplarVendido.libro.autor")
