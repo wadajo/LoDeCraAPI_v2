@@ -30,13 +30,11 @@ public class VentaRepositoryImplMongo implements VentaRepository {
     @Override
     public boolean estaVendido(String codLibro, Integer nroEjemplar) {
         var ejemplarVendidoOptional= ejemplarMongoRepository.findByCodLibroAndNroEjemplar(codLibro, nroEjemplar);
-        boolean vendido=false;
-        if (ejemplarVendidoOptional.isPresent())
-            vendido=null!=ejemplarVendidoOptional.get().vendido()?
-                    ejemplarVendidoOptional.get().vendido():
-                    false;
 
-        return vendido;
+        return ejemplarVendidoOptional
+                .filter(ejemplarMongo -> null != ejemplarMongo.vendidoFecha())
+                .isPresent();
+
     }
 
 

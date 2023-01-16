@@ -69,7 +69,6 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         query.addCriteria(where("nroEjemplar").is(ventaAHacer.getEjemplarVendido().getNroEjemplar()));
         query.addCriteria(where("codLibro").is(ventaAHacer.getEjemplarVendido().getLibro().getCodigo()));
         Update update = new Update();
-        update.set("vendido",Boolean.TRUE);
         update.set("vendidoFecha",ventaAHacer.getFechaHoraVendido());
         update.set("precioVendido",ventaAHacer.getPrecioVendido());
         mongoTemplate.updateFirst(query,update,EjemplarMongo.class);

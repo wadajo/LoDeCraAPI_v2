@@ -13,6 +13,5 @@ public record EjemplarMongo(
         @Field String modalidad,
         @Field LocalDateTime agregado,
         @Field LocalDateTime vendidoFecha,
-        @Field Integer precioVendido,
-        @Field Boolean vendido
+        @Field Integer precioVendido
 ) {}

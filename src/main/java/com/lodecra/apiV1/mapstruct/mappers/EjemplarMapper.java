@@ -30,7 +30,6 @@ public interface EjemplarMapper {
     Ejemplar ejemplarMongoToEjemplar(EjemplarMongo ejemplarMongo);
 
     @Mapping(target = "vendidoFecha", ignore = true)
-    @Mapping(target = "vendido", ignore = true)
     @Mapping(target = "precioVendido", ignore = true)
     @Mapping(source = "libro.codigo", target = "codLibro")
     EjemplarMongo ejemplarToEjemplarMongo(Ejemplar ejemplar);
