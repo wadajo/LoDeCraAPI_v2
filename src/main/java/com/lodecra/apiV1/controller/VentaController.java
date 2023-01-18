@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -41,6 +43,17 @@ public class VentaController {
             log.error("El volumen "+nroEjemplar+" del libro con código "+codLibro+" ya fue vendido con anterioridad.");
             throw e;
         }
+    }
+
+    @GetMapping("/ventas/{codLibro}")
+    public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@PathVariable String codLibro) {
+        log.info("Llamando a GET /ventas para libro de código "+codLibro);
+        List<VentaDto> ventasDto=new ArrayList<>();
+        ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(ventaMapper.ventaToVentaDto(unaVenta)));
+        if (ventasDto.isEmpty())
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        else
+            return ResponseEntity.ok(ventasDto);
     }
 
 }

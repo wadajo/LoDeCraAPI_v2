@@ -2,6 +2,7 @@ package com.lodecra.apiV1.mapstruct.mappers;
 
 import com.lodecra.apiV1.dto.VentaDto;
 import com.lodecra.apiV1.model.Venta;
+import com.lodecra.apiV1.repository.adapter.document.EjemplarMongo;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -27,4 +28,6 @@ public interface VentaMapper {
     @Mapping(target = "priceSold", source = "venta.precioVendido")
     VentaDto ventaToVentaDto(Venta venta);
 
-    }
+    @Mapping(target = "ejemplarVendido.libro.codigo", source = "codLibro")
+    Venta ejemplarMongoToVenta(EjemplarMongo ejemplarMongo);
+}

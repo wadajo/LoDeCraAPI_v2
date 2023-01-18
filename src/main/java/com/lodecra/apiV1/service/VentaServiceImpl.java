@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 @Transactional(readOnly = true)
 @Service
@@ -35,6 +36,12 @@ public class VentaServiceImpl implements VentaService {
         Venta aHacer=crearVentaAhora(codLibro, nroEjemplar);
         ejemplarRepository.venderEjemplar(aHacer);
         return aHacer;
+    }
+
+    @Override
+    public List<Venta> listarVentasDelLibro(String codLibro) {
+        return ventaRepository.todasLasVentasDelLibro(codLibro);
+
     }
 
     private Venta crearVentaAhora(String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException {
