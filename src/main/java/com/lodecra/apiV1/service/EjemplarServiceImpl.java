@@ -2,7 +2,6 @@ package com.lodecra.apiV1.service;
 
 import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.model.Ejemplar;
-import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.service.port.EjemplarService;
@@ -45,11 +44,8 @@ public class EjemplarServiceImpl implements EjemplarService {
     @Override
     public Optional<Ejemplar> getEjemplarNro(String codLibro, Integer nroEjemplar) throws WrongVolumeNoException {
         var ejemplarEncontrado=ejemplarRepository.obtenerEjemplarNro(codLibro, nroEjemplar);
-        if (ejemplarEncontrado.isPresent()){
-            var libroAAnadir=libroRepository.obtenerLibroPorCodigo(codLibro);
-            ejemplarEncontrado.get().setLibro(libroAAnadir.orElseGet(Libro::new));
+        if (ejemplarEncontrado.isPresent())
             return ejemplarEncontrado;
-        }
         else
             throw new WrongVolumeNoException(codLibro,nroEjemplar);
     }

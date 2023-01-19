@@ -58,8 +58,9 @@ public class VentaRepositoryImplMongo implements VentaRepository {
                 var ejADevolverCompleto=ejADevolver.get();
                 var libroADevolver=libroRepository.obtenerLibroPorCodigo(ejMongo.codLibro());
                 if (libroADevolver.isPresent()) {
+                    var precioVendido=null!=ejMongo.precioVendido()?ejMongo.precioVendido():libroADevolver.get().getPrecio();
                     ejADevolverCompleto.setLibro(libroADevolver.get());
-                    Venta ventaADevolver = new Venta(ejADevolverCompleto, ejMongo.vendidoFecha(), ejMongo.precioVendido());
+                    Venta ventaADevolver = new Venta(ejADevolverCompleto, ejMongo.vendidoFecha(), precioVendido);
                     ventasDeLibro.add(ventaADevolver);
                 }
             }

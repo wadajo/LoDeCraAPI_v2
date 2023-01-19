@@ -6,12 +6,13 @@ import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Venta;
 import com.lodecra.apiV1.repository.adapter.document.EjemplarMongo;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
+import com.lodecra.apiV1.repository.port.LibroRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +25,16 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 @Primary
 public class EjemplarRepositoryImplMongo implements EjemplarRepository {
     private final EjemplarMongoRepository mongoRepository;
+
+    private final LibroRepository libroRepository;
+
     private final EjemplarMapper mapper;
 
     private final MongoTemplate mongoTemplate;
 
-    public EjemplarRepositoryImplMongo(EjemplarMongoRepository mongoRepository, EjemplarMapper mapper, MongoTemplate mongoTemplate) {
+    public EjemplarRepositoryImplMongo(EjemplarMongoRepository mongoRepository, LibroRepository libroRepository, EjemplarMapper mapper, MongoTemplate mongoTemplate) {
         this.mongoRepository = mongoRepository;
+        this.libroRepository = libroRepository;
         this.mapper = mapper;
         this.mongoTemplate = mongoTemplate;
     }
@@ -49,8 +54,13 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
     public Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer nroEjemplar) {
         Ejemplar encontrado=null;
         var ejemplarADevolver=mongoRepository.findByCodLibroAndNroEjemplar(codLibro, nroEjemplar);
-        if (ejemplarADevolver.isPresent())
-            encontrado=mapper.ejemplarMongoToEjemplar(ejemplarADevolver.get());
+        if (ejemplarADevolver.isPresent()) {
+            var libroAAnadir=libroRepository.obtenerLibroPorCodigo(codLibro);
+            if (libroAAnadir.isPresent()) {
+                encontrado = mapper.ejemplarMongoToEjemplar(ejemplarADevolver.get());
+                encontrado.setLibro(libroAAnadir.get());
+            }
+        }
         return Optional.ofNullable(encontrado);
     }
 
