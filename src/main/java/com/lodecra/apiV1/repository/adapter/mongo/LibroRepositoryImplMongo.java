@@ -6,7 +6,6 @@ import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.adapter.document.LibroMongo;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.util.Utilidades;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
@@ -26,9 +25,6 @@ public class LibroRepositoryImplMongo implements LibroRepository {
     private final LibroMongoRepository mongoRepository;
     private final LibroMapper mapper;
     private final MongoTemplate mongoTemplate;
-
-    @Value("${spring.data.mongodb.collection}")
-    private String collectionName;
 
     public LibroRepositoryImplMongo(LibroMongoRepository mongoRepository, LibroMapper mapper, MongoTemplate mongoTemplate) {
         this.mongoRepository = mongoRepository;

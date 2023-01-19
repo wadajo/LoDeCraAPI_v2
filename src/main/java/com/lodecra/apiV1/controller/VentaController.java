@@ -50,10 +50,14 @@ public class VentaController {
         log.info("Llamando a GET /ventas para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
         ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(ventaMapper.ventaToVentaDto(unaVenta)));
-        if (ventasDto.isEmpty())
+        if (ventasDto.isEmpty()) {
+            log.error("No se encontraron ventas de este libro.");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        else
+        }
+        else {
+            log.info("Devolviendo "+ventasDto.size()+" ventas encontradas de este libro.");
             return ResponseEntity.ok(ventasDto);
+        }
     }
 
 }
