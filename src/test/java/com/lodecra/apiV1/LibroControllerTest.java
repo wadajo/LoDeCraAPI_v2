@@ -31,7 +31,6 @@ public class LibroControllerTest {
 
     @MockBean
     private LibroService libroService;
-
     @MockBean
     private LibroMapper mapper;
     @Autowired

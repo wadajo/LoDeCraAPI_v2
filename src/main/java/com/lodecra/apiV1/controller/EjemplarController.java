@@ -8,6 +8,7 @@ import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.service.port.EjemplarService;
 import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +64,7 @@ public class EjemplarController {
             @RequestParam String modalidad,
             @RequestParam String ubicacion) {
         log.info("Llamando a POST /ejemplares/"+codLibro+" para nuevo ejemplar.");
-        Ejemplar guardado=null;
+        Ejemplar guardado;
         try{
             guardado=ejemplarService.guardarNuevoEjemplar(codLibro,ubicacion,modalidad);
             log.info("Guardado el ejemplar nro. "+guardado.getNroEjemplar()+" de libro de código "+guardado.getLibro().getCodigo());
@@ -74,7 +75,7 @@ public class EjemplarController {
             log.error("No se encontró el libro con código "+codLibro);
             throw e;
         }
-        return ResponseEntity.ok(mapper.ejemplarAndLibroToEjemplarDto(guardado,guardado.getLibro()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.ejemplarAndLibroToEjemplarDto(guardado,guardado.getLibro()));
     }
 
 }
