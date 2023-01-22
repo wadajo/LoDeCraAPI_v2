@@ -1,0 +1,12 @@
+type Query{
+    librosDisponibles: [LibroLite]
+}
+
+type LibroLite{
+    code: ID
+    name: String!
+    author: String!
+    price: Int!
+    publisher: String
+    contact: String
+}
