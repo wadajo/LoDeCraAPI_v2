@@ -1,8 +1,8 @@
 type Query{
-    librosDisponibles: [LibroLite]
+    librosDisponibles: [LibroDto]
 }
 
-type LibroLite{
+type LibroDto{
     code: ID
     name: String!
     author: String!
