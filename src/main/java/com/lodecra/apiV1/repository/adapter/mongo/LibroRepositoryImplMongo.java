@@ -8,6 +8,8 @@ import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.util.Utilidades;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +34,10 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         this.mongoTemplate = mongoTemplate;
     }
     @Override
-    public Optional<List<Libro>> obtenerTodosLosLibros(){
-        var todosLosLibrosMongo = mongoRepository.findAll();
+    public Optional<List<Libro>> obtenerTodosLosLibrosDisponibles(){
+        Query query=new Query();
+        query.addCriteria(where("descartado").ne(true));
+        var todosLosLibrosMongo=mongoTemplate.query(LibroMongo.class).matching(query).all();
         return conContenidoOVacio(todosLosLibrosMongo);
     }
 
@@ -87,13 +91,13 @@ public class LibroRepositoryImplMongo implements LibroRepository {
 
     @Transactional
     @Override
-    public Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo) {
+    public Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codLibro) {
         Optional<Libro> aDevolver = Optional.empty();
-        if(mongoRepository.findByCodigo(codigo).isPresent()) {
-            LibroMongo nuevo = construirLibroMongoEditado(editadoSinCodigo, codigo);
+        if(mongoRepository.findByCodigo(codLibro).isPresent()) {
+            LibroMongo nuevo = construirLibroMongoEditado(editadoSinCodigo, codLibro);
             mongoTemplate
                     .update(LibroMongo.class)
-                    .matching(query(where("codigo").is(codigo)))
+                    .matching(query(where("codigo").is(codLibro)))
                     .replaceWith(nuevo)
                     .findAndReplace();
             aDevolver = Optional.of(mapper.libroMongoToLibro(nuevo));
@@ -103,28 +107,16 @@ public class LibroRepositoryImplMongo implements LibroRepository {
 
     @Transactional
     @Override
-    public void descartarLibro(String codigo) {
-        var aDevolverOptional = mongoRepository.findByCodigo(codigo);
-        if(aDevolverOptional.isPresent()) {
-            var aDevolverSinDescartar = aDevolverOptional.get();
-            LibroMongo descartado = construirLibroMongoADescartar(aDevolverSinDescartar);
+    public void descartarLibro(String codLibro) {
+        if(mongoRepository.findByCodigo(codLibro).isPresent()) {
+            Update update = new Update();
+            update.set("descartado",Boolean.TRUE);
             mongoTemplate
                     .update(LibroMongo.class)
-                    .matching(query(where("codigo").is(codigo)))
-                    .replaceWith(descartado)
-                    .findAndReplace();
+                    .matching(query(where("codigo").is(codLibro)))
+                    .apply(update)
+                    .first();
         }
-    }
-
-    private LibroMongo construirLibroMongoADescartar(LibroMongo aDevolverSinDescartar) {
-        return new LibroMongo(aDevolverSinDescartar.codigo(),
-                aDevolverSinDescartar.titulo(),
-                aDevolverSinDescartar.autor(),
-                aDevolverSinDescartar.precio(),
-                aDevolverSinDescartar.editorial(),
-                aDevolverSinDescartar.contacto(),
-                aDevolverSinDescartar.stock(),
-                Boolean.TRUE);
     }
 
     private LibroMongo construirLibroMongoEditado(Libro editadoSinCodigo, String codigo) {

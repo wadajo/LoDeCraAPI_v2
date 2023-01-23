@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface LibroService {
 
-    Optional<List<Libro>> getLibros() throws EmptySearchException;
+    Optional<List<Libro>> getLibrosDisponibles() throws EmptySearchException;
 
     Optional<List<Libro>> getLibrosPorBusquedaGral(String keyword) throws EmptySearchException;
 

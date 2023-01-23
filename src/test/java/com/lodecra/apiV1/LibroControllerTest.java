@@ -46,7 +46,7 @@ public class LibroControllerTest {
 
         List<Libro> todosLosLibros = List.of(libro);
 
-        given(libroService.getLibros()).willReturn(Optional.of(todosLosLibros));
+        given(libroService.getLibrosDisponibles()).willReturn(Optional.of(todosLosLibros));
         given(mapper.libroToLibroDto(libro)).willReturn(new LibroDto(libro.getCodigo(), libro.getTitulo(),libro.getAutor(),libro.getPrecio(), libro.getEditorial(), libro.getContacto(), libro.getStock(), libro.getDescartado()));
 
         mvc.perform(get(baseUrl+"/libros")

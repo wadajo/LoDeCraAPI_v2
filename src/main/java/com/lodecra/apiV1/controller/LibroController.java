@@ -41,13 +41,13 @@ public class LibroController {
                 todosLosLibros = libroService.getLibrosPorBusquedaGral(keyword).orElseThrow(EmptySearchException::new);
             } else {
                 log.info("Llamando a GET /libros.");
-                todosLosLibros = libroService.getLibros().orElseThrow(EmptySearchException::new);
+                todosLosLibros = libroService.getLibrosDisponibles().orElseThrow(EmptySearchException::new);
             }
         } catch (EmptySearchException e) {
-            log.error("No se encontraron libros.");
+            log.error("No se encontraron libros disponibles.");
             throw e;
         }
-        log.info("Devolviendo "+todosLosLibros.size()+" libros.");
+        log.info("Devolviendo "+todosLosLibros.size()+" libros disponibles.");
         var todosLosLibrosDto = todosLosLibros.stream().map(mapper::libroToLibroDto).toList();
         return ResponseEntity.ok(todosLosLibrosDto);
     }

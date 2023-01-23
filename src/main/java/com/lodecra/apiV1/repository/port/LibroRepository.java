@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface LibroRepository {
 
-    Optional<List<Libro>> obtenerTodosLosLibros();
+    Optional<List<Libro>> obtenerTodosLosLibrosDisponibles();
 
     Optional<List<Libro>> obtenerLibrosPorBusquedaGeneral(String keyword);
 
@@ -20,7 +20,7 @@ public interface LibroRepository {
 
     Optional<Libro> buscarLibroPorTituloYAutor(String titulo, String autor);
 
-    Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codigo);
+    Optional<Libro> editarLibroExistente(Libro editadoSinCodigo, String codLibro);
 
-    void descartarLibro(String codigo);
+    void descartarLibro(String codLibro);
 }

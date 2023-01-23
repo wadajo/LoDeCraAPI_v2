@@ -24,8 +24,8 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public Optional<List<Libro>> getLibros() {
-        var encontrados=repository.obtenerTodosLosLibros();
+    public Optional<List<Libro>> getLibrosDisponibles() {
+        var encontrados=repository.obtenerTodosLosLibrosDisponibles();
         if (encontrados.isEmpty()){
             throw new EmptySearchException();
         } else {

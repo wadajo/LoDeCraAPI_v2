@@ -6,14 +6,12 @@ import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 
-@RestController
-@RequestMapping("/api/lodecra/v2")
+@Controller
 @Slf4j
 public class LibroGraphqlController {
 
