@@ -2,7 +2,7 @@ package com.lodecra.apiV1;
 
 import com.lodecra.apiV1.controller.EjemplarController;
 import com.lodecra.apiV1.dto.EjemplarDto;
-import com.lodecra.apiV1.dto.LibroDto;
+import com.lodecra.apiV1.dto.BookDto;
 import com.lodecra.apiV1.mapstruct.mappers.EjemplarMapper;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Libro;
@@ -51,7 +51,7 @@ public class EjemplarControllerTest {
 
         given(libroService.getLibroPorCodigo(anyString())).willReturn(Optional.of(libro));
         given(ejemplarService.getEjemplaresPorCodigoLibro(anyString())).willReturn(Optional.of(List.of(ejemplar)));
-        given(mapper.ejemplarAndLibroToEjemplarDto(any(Ejemplar.class),any(Libro.class))).willReturn(new EjemplarDto(new LibroDto("55_EmaAi","Ema, la cautiva","Aira",990,"EUDEBA",null,1,false),1,"Madrid","firme",LocalDateTime.now().toString()));
+        given(mapper.ejemplarAndLibroToEjemplarDto(any(Ejemplar.class),any(Libro.class))).willReturn(new EjemplarDto(new BookDto("55_EmaAi","Ema, la cautiva","Aira",990,"EUDEBA",null,1,false),1,"Madrid","firme",LocalDateTime.now().toString()));
 
         mvc.perform(get(baseUrl+"/ejemplares/{codLibro}","55_EmaAi"))
                 .andExpect(status().isOk())
@@ -64,7 +64,7 @@ public class EjemplarControllerTest {
         Ejemplar ejemplar1=new Ejemplar(libro1,1,"Madrid","firme", LocalDateTime.now());
 
         given(ejemplarService.guardarNuevoEjemplar(anyString(),anyString(),anyString())).willReturn(ejemplar1);
-        given(mapper.ejemplarAndLibroToEjemplarDto(any(Ejemplar.class),any(Libro.class))).willReturn(new EjemplarDto(new LibroDto("55_EmaAi","Ema, la cautiva","Aira",990,"EUDEBA",null,1,false),1,"Madrid","firme",LocalDateTime.now().toString()));
+        given(mapper.ejemplarAndLibroToEjemplarDto(any(Ejemplar.class),any(Libro.class))).willReturn(new EjemplarDto(new BookDto("55_EmaAi","Ema, la cautiva","Aira",990,"EUDEBA",null,1,false),1,"Madrid","firme",LocalDateTime.now().toString()));
 
         mvc.perform(post(baseUrl+"/ejemplares/{codLibro}","55_EmaAi")
                         .queryParam("ubicacion","Madrid")

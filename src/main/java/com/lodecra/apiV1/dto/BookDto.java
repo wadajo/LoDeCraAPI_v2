@@ -2,7 +2,7 @@ package com.lodecra.apiV1.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-public record LibroDto(
+public record BookDto(
         @JsonInclude(JsonInclude.Include.NON_NULL) String code,
        String name,
        String author,

@@ -1,7 +1,7 @@
 package com.lodecra.apiV1.dto;
 
 public record EjemplarDto(
-        LibroDto book,
+        BookDto book,
         Integer volumeNum,
         String location,
         String modality,

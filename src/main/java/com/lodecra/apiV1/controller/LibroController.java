@@ -1,6 +1,6 @@
 package com.lodecra.apiV1.controller;
 
-import com.lodecra.apiV1.dto.LibroDto;
+import com.lodecra.apiV1.dto.BookDto;
 import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
@@ -28,7 +28,7 @@ public class LibroController {
     }
 
     @GetMapping("/libros")
-    public ResponseEntity<List<LibroDto>> librosDisponibles
+    public ResponseEntity<List<BookDto>> librosDisponibles
             (@RequestParam(required = false) String keyword,
              @RequestParam(required = false) String campoABuscar){
         List<Libro> todosLosLibros;
@@ -48,12 +48,12 @@ public class LibroController {
             throw e;
         }
         log.info("Devolviendo "+todosLosLibros.size()+" libros disponibles.");
-        var todosLosLibrosDto = todosLosLibros.stream().map(mapper::libroToLibroDto).toList();
+        var todosLosLibrosDto = todosLosLibros.stream().map(mapper::libroToBookDto).toList();
         return ResponseEntity.ok(todosLosLibrosDto);
     }
 
     @GetMapping("/libros/{codigo}")
-    public ResponseEntity<Optional<LibroDto>> libroPorCodigo(@PathVariable String codigo){
+    public ResponseEntity<Optional<BookDto>> libroPorCodigo(@PathVariable String codigo){
         log.info("Llamando a GET /libros/{codigo} para libro con código "+codigo);
         Optional<Libro> aDevolver;
         try {
@@ -66,18 +66,18 @@ public class LibroController {
             log.error("No se encontró el libro con código "+codigo);
             throw e;
         }
-        return ResponseEntity.ok(aDevolver.map(mapper::libroToLibroDto));
+        return ResponseEntity.ok(aDevolver.map(mapper::libroToBookDto));
     }
 
     @PostMapping("/libros")
-    public ResponseEntity<LibroDto> nuevoLibro(@RequestBody Libro nuevo) {
+    public ResponseEntity<BookDto> nuevoLibro(@RequestBody Libro nuevo) {
         String titulo = nuevo.getTitulo();
         String autor = nuevo.getAutor();
         log.info("Llamando a POST /libros con nuevo libro. Título: "+titulo+". Autor: "+autor+".");
         Optional<Libro> guardado;
         try {
             guardado = libroService.guardarNuevoLibro(nuevo);
-            LibroDto aDevolver = mapper.libroToLibroDto(guardado.orElseGet(Libro::new));
+            BookDto aDevolver = mapper.libroToBookDto(guardado.orElseGet(Libro::new));
             log.info("Guardado nuevo libro. Título: "+titulo+". Autor: "+autor+". Código: "+aDevolver.code());
             return ResponseEntity.status(HttpStatus.CREATED).body(aDevolver);
         } catch (BookNotSavedException | DuplicatedBookException e) {
@@ -87,14 +87,14 @@ public class LibroController {
     }
 
     @PutMapping("/libros/{codigo}")
-    public ResponseEntity<LibroDto> editarLibro(@RequestBody Libro editado, @PathVariable String codigo) {
+    public ResponseEntity<BookDto> editarLibro(@RequestBody Libro editado, @PathVariable String codigo) {
         log.info("Llamando a PUT /libros/{codigo} con libro de código "+codigo);
         try {
             var libroExistente = libroService.getLibroPorCodigo(codigo);
             if(libroExistente.isPresent()) {
                 log.info("Encontrado en la Base. Título: "+libroExistente.get().getTitulo());
                 var guardado = libroService.editarLibro(editado,codigo);
-                LibroDto aDevolver = mapper.libroToLibroDto(guardado.orElseThrow(()-> new BookNotFoundException(codigo)));
+                BookDto aDevolver = mapper.libroToBookDto(guardado.orElseThrow(()-> new BookNotFoundException(codigo)));
                 log.info("Actualizado libro. Título: " + aDevolver.name() + ". Autor: " + aDevolver.author() + ". Código: " + codigo);
                 return ResponseEntity.ok(aDevolver);
             } else {
@@ -107,14 +107,14 @@ public class LibroController {
     }
 
     @DeleteMapping("/libros/{codigo}")
-    public ResponseEntity<LibroDto> borrarLibro(@PathVariable String codigo) {
+    public ResponseEntity<BookDto> borrarLibro(@PathVariable String codigo) {
         log.info("Llamando a DELETE /libros/{codigo} con libro de código "+codigo);
         try {
             var libroExistente = libroService.getLibroPorCodigo(codigo);
             if(libroExistente.isPresent() && (null==libroExistente.get().getDescartado() || !libroExistente.get().getDescartado())) {
                 log.info("Encontrado en la Base. Título: "+libroExistente.get().getTitulo());
                 libroService.descartarLibro(codigo);
-                LibroDto aDevolver = mapper.libroToLibroDto(libroService.getLibroPorCodigo(codigo).orElseThrow(()-> new BookNotFoundException(codigo)));
+                BookDto aDevolver = mapper.libroToBookDto(libroService.getLibroPorCodigo(codigo).orElseThrow(()-> new BookNotFoundException(codigo)));
                 log.info("Descartado libro. Título: " + aDevolver.name() + ". Autor: " + aDevolver.author() + ". Código: " + codigo);
                 return ResponseEntity.ok(aDevolver);
             } else if (libroExistente.isPresent()) {

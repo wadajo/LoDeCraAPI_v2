@@ -1,6 +1,6 @@
 package com.lodecra.apiV1.mapstruct.mappers;
 
-import com.lodecra.apiV1.dto.LibroDto;
+import com.lodecra.apiV1.dto.BookDto;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.adapter.document.LibroMongo;
 import org.mapstruct.InjectionStrategy;
@@ -19,7 +19,7 @@ public interface LibroMapper {
     @Mapping(target = "contact", source = "contacto", defaultValue = "N/A")
     @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "discarded", source = "descartado", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    LibroDto libroToLibroDto(Libro libro);
+    BookDto libroToBookDto(Libro libro);
 
     @Mapping(target = "codigo", source = "code")
     @Mapping(target = "titulo", source = "name", defaultValue = "N/A")
@@ -29,7 +29,7 @@ public interface LibroMapper {
     @Mapping(target = "contacto", source = "contact", defaultValue = "N/A")
     @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "descartado", source = "discarded", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    Libro libroDtoToLibro(LibroDto libroDto);
+    Libro bookDtoToLibro(BookDto bookDto);
 
     @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "descartado", source = "descartado", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)

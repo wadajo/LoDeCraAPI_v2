@@ -1,8 +1,8 @@
 package com.lodecra.apiV1.controller;
 
-import com.lodecra.apiV1.dto.LibroDto;
+import com.lodecra.apiV1.dto.BookDto;
+import com.lodecra.apiV1.exception.EmptySearchException;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
-import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -25,10 +25,10 @@ public class LibroGraphqlController {
     }
 
     @QueryMapping
-    public Flux<LibroDto> librosDisponibles(){
-        var todosLosLibros=new ArrayList<Libro>();
-        var todosLosLibrosDto=new ArrayList<LibroDto>();
-
+    public Flux<BookDto> booksAvailable(){
+        var todosLosLibrosDto=new ArrayList<BookDto>();
+        var librosDisponibles=libroService.getLibrosDisponibles().orElseThrow(EmptySearchException::new);
+        librosDisponibles.forEach(libro-> todosLosLibrosDto.add(mapper.libroToBookDto(libro)));
         return Flux.fromIterable(todosLosLibrosDto);
     }
 
