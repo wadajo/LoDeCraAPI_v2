@@ -10,7 +10,7 @@ public interface LibroService {
 
     List<Libro> getLibrosDisponibles() throws EmptySearchException;
 
-    Optional<List<Libro>> getLibrosPorBusquedaGral(String keyword) throws EmptySearchException;
+    List<Libro> getLibrosDisponiblesPorBusquedaGral(String keyword) throws EmptySearchException;
 
     Optional<List<Libro>> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) throws EmptySearchException;
 

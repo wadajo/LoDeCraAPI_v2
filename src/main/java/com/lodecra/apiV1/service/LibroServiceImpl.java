@@ -34,12 +34,12 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public Optional<List<Libro>> getLibrosPorBusquedaGral(String keyword) {
-        var encontrados=repository.obtenerLibrosPorBusquedaGeneral(keyword);
+    public List<Libro> getLibrosDisponiblesPorBusquedaGral(String keyword) {
+        var encontrados=repository.obtenerLibrosDisponiblesPorBusquedaGeneral(keyword);
         if (encontrados.isEmpty()){
             throw new EmptySearchException();
         } else {
-            return encontrados;
+            return encontrados.get();
         }
     }
 

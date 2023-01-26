@@ -10,7 +10,7 @@ public interface LibroRepository {
 
     Optional<List<Libro>> obtenerTodosLosLibrosDisponibles();
 
-    Optional<List<Libro>> obtenerLibrosPorBusquedaGeneral(String keyword);
+    Optional<List<Libro>> obtenerLibrosDisponiblesPorBusquedaGeneral(String keyword);
 
     Optional<List<Libro>> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar);
 

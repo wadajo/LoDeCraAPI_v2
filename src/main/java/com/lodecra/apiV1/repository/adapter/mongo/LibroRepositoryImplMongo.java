@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,9 +43,14 @@ public class LibroRepositoryImplMongo implements LibroRepository {
     }
 
     @Override
-    public Optional<List<Libro>> obtenerLibrosPorBusquedaGeneral(String keyword) {
-        var librosEncontrados = filtrarLibrosPorKeywordGeneral(keyword, mongoRepository.findAll());
-        return conContenidoOVacio(librosEncontrados);
+    public Optional<List<Libro>> obtenerLibrosDisponiblesPorBusquedaGeneral(String keyword) {
+        var todosLosLibros=obtenerTodosLosLibrosDisponibles();
+        List<Libro> librosEncontrados = Collections.emptyList();
+        if (todosLosLibros.isPresent())
+            librosEncontrados= filtrarLibrosPorKeywordGeneral(keyword,todosLosLibros.get());
+        return librosEncontrados.isEmpty() ?
+                Optional.empty() :
+                Optional.of(librosEncontrados);
     }
 
     @Override
@@ -136,13 +142,13 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         return aDevolver;
     }
 
-    private List<LibroMongo> filtrarLibrosPorKeywordGeneral(String keyword, List<LibroMongo> todosLosLibrosMongo) {
+    private List<Libro> filtrarLibrosPorKeywordGeneral(String keyword, List<Libro> libros) {
         String keywordLC=keyword.toLowerCase();
-        return todosLosLibrosMongo.stream().filter(libro ->
-                (null != libro.autor() && libro.autor().toLowerCase().contains(keywordLC))
-                        || (null != libro.titulo() && libro.titulo().toLowerCase().contains(keywordLC))
-                        || (null != libro.editorial() && libro.editorial().toLowerCase().contains(keywordLC))
-                        || (null != libro.contacto() && libro.contacto().toLowerCase().contains(keywordLC))
+        return libros.stream().filter(libro ->
+                (null != libro.getAutor() && libro.getAutor().toLowerCase().contains(keywordLC))
+                        || (null != libro.getTitulo() && libro.getTitulo().toLowerCase().contains(keywordLC))
+                        || (null != libro.getEditorial() && libro.getEditorial().toLowerCase().contains(keywordLC))
+                        || (null != libro.getContacto() && libro.getContacto().toLowerCase().contains(keywordLC))
         ).toList();
     }
 
