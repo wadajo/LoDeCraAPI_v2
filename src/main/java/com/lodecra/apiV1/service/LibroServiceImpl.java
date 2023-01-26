@@ -24,12 +24,12 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public Optional<List<Libro>> getLibrosDisponibles() {
+    public List<Libro> getLibrosDisponibles() throws EmptySearchException{
         var encontrados=repository.obtenerTodosLosLibrosDisponibles();
         if (encontrados.isEmpty()){
             throw new EmptySearchException();
         } else {
-            return encontrados;
+            return encontrados.get();
         }
     }
 

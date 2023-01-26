@@ -41,7 +41,7 @@ public class LibroController {
                 todosLosLibros = libroService.getLibrosPorBusquedaGral(keyword).orElseThrow(EmptySearchException::new);
             } else {
                 log.info("Llamando a GET /libros.");
-                todosLosLibros = libroService.getLibrosDisponibles().orElseThrow(EmptySearchException::new);
+                todosLosLibros = libroService.getLibrosDisponibles();
             }
         } catch (EmptySearchException e) {
             log.error("No se encontraron libros disponibles.");
