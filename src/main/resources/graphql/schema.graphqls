@@ -1,5 +1,6 @@
 type Query{
     booksAvailable: [BookDto]
+    booksContainingKeyword(keyword: String!):[BookDto]
 }
 
 type BookDto{
