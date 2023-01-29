@@ -102,7 +102,7 @@ public class LibroControllerTest {
 
         List<Libro> encontrados = List.of(libro1,libro2);
 
-        given(libroService.getLibrosPorBusquedaAvz(anyString(),anyString())).willReturn(Optional.of(encontrados));
+        given(libroService.getLibrosPorBusquedaAvz(anyString(),anyString())).willReturn(encontrados);
         given(mapper.libroToBookDto(libro1)).willReturn(new BookDto(libro1.getCodigo(), libro1.getTitulo(),libro1.getAutor(),libro1.getPrecio(), libro1.getEditorial(), libro1.getContacto(), libro1.getStock(), libro1.getDescartado()));
         given(mapper.libroToBookDto(libro2)).willReturn(new BookDto(libro2.getCodigo(), libro2.getTitulo(),libro2.getAutor(),libro2.getPrecio(), libro2.getEditorial(), libro2.getContacto(), libro2.getStock(), libro2.getDescartado()));
 

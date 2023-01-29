@@ -47,6 +47,7 @@ public class VentaController {
 
     @GetMapping("/ventas/{codLibro}")
     public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@PathVariable String codLibro) {
+        //TODO Controlar formato codigo y arrojar excepcion
         log.info("Llamando a GET /ventas para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
         ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(ventaMapper.ventaToVentaDto(unaVenta)));

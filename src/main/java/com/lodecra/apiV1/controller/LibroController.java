@@ -35,7 +35,7 @@ public class LibroController {
         try {
             if(null!=keyword && null!=campoABuscar) {
                 log.info("Llamando a GET /libros con búsqueda avanzada por "+campoABuscar+". Keyword: " + keyword);
-                todosLosLibros = libroService.getLibrosPorBusquedaAvz(keyword, campoABuscar).orElseThrow(EmptySearchException::new);
+                todosLosLibros = libroService.getLibrosPorBusquedaAvz(keyword, campoABuscar);
             } else if(null != keyword) {
                 log.info("Llamando a GET /libros con búsqueda general. Keyword: " + keyword);
                 todosLosLibros = libroService.getLibrosDisponiblesPorBusquedaGral(keyword);

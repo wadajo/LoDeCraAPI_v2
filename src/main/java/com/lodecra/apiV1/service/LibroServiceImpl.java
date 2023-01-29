@@ -39,12 +39,12 @@ public class LibroServiceImpl implements LibroService {
         if (encontrados.isEmpty()){
             throw new EmptySearchException();
         } else {
-            return encontrados.get();
+            return encontrados;
         }
     }
 
     @Override
-    public Optional<List<Libro>> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
+    public List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var encontrados=repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
         if (encontrados.isEmpty()){
             throw new EmptySearchException();

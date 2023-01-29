@@ -43,20 +43,21 @@ public class LibroRepositoryImplMongo implements LibroRepository {
     }
 
     @Override
-    public Optional<List<Libro>> obtenerLibrosDisponiblesPorBusquedaGeneral(String keyword) {
+    public List<Libro> obtenerLibrosDisponiblesPorBusquedaGeneral(String keyword) {
         var todosLosLibros=obtenerTodosLosLibrosDisponibles();
         List<Libro> librosEncontrados = Collections.emptyList();
         if (todosLosLibros.isPresent())
             librosEncontrados= filtrarLibrosPorKeywordGeneral(keyword,todosLosLibros.get());
-        return librosEncontrados.isEmpty() ?
-                Optional.empty() :
-                Optional.of(librosEncontrados);
+        return librosEncontrados;
     }
 
     @Override
-    public Optional<List<Libro>> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
-        var librosEncontrados = filtrarLibrosPorKeywordAvz(keyword,campoABuscar,mongoRepository.findAll());
-        return conContenidoOVacio(librosEncontrados);
+    public List<Libro> obtenerLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
+        var todosLosLibros=obtenerTodosLosLibrosDisponibles();
+        List<Libro> librosEncontrados = Collections.emptyList();
+        if (todosLosLibros.isPresent())
+            librosEncontrados = filtrarLibrosPorKeywordAvz(keyword,campoABuscar,todosLosLibros.get());
+        return librosEncontrados;
     }
 
     @Override
@@ -152,20 +153,20 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         ).toList();
     }
 
-    private List<LibroMongo> filtrarLibrosPorKeywordAvz(String keyword, String campoABuscar, List<LibroMongo> todosLosLibrosMongo) {
+    private List<Libro> filtrarLibrosPorKeywordAvz(String keyword, String campoABuscar, List<Libro> todosLosLibros) {
         String keywordLC=keyword.toLowerCase();
-        return todosLosLibrosMongo.stream().filter(libro -> switch (campoABuscar){
+        return todosLosLibros.stream().filter(libro -> switch (campoABuscar){
             case "autor":
-                if(null != libro.autor() && libro.autor().toLowerCase().contains(keywordLC))
+                if(null != libro.getAutor() && libro.getAutor().toLowerCase().contains(keywordLC))
                     yield true;
             case "titulo":
-                if(null != libro.titulo() && libro.titulo().toLowerCase().contains(keywordLC))
+                if(null != libro.getTitulo() && libro.getTitulo().toLowerCase().contains(keywordLC))
                     yield true;
             case "editorial":
-                if(null != libro.editorial() && libro.editorial().toLowerCase().contains(keywordLC))
+                if(null != libro.getEditorial() && libro.getEditorial().toLowerCase().contains(keywordLC))
                     yield true;
             case "contacto":
-                if(null != libro.contacto() && libro.contacto().toLowerCase().contains(keywordLC))
+                if(null != libro.getContacto() && libro.getContacto().toLowerCase().contains(keywordLC))
                     yield true;
             default:
                 yield false;

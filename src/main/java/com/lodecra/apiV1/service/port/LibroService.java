@@ -12,7 +12,7 @@ public interface LibroService {
 
     List<Libro> getLibrosDisponiblesPorBusquedaGral(String keyword) throws EmptySearchException;
 
-    Optional<List<Libro>> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) throws EmptySearchException;
+    List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) throws EmptySearchException;
 
     Optional<Libro> getLibroPorCodigo (String codigo) throws WrongIdFormatException, BookNotFoundException;
 
