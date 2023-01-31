@@ -2,6 +2,7 @@ package com.lodecra.apiV1.controller;
 
 import com.lodecra.apiV1.dto.VentaDto;
 import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
+import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.exception.WrongVolumeNoException;
 import com.lodecra.apiV1.mapstruct.mappers.VentaMapper;
 import com.lodecra.apiV1.service.port.VentaService;
@@ -47,17 +48,21 @@ public class VentaController {
 
     @GetMapping("/ventas/{codLibro}")
     public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@PathVariable String codLibro) {
-        //TODO Controlar formato codigo y arrojar excepcion
         log.info("Llamando a GET /ventas para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
-        ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(ventaMapper.ventaToVentaDto(unaVenta)));
-        if (ventasDto.isEmpty()) {
-            log.error("No se encontraron ventas de este libro.");
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        else {
-            log.info("Devolviendo "+ventasDto.size()+" ventas encontradas de este libro.");
-            return ResponseEntity.ok(ventasDto);
+        try {
+            ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(ventaMapper.ventaToVentaDto(unaVenta)));
+            if (ventasDto.isEmpty()) {
+                log.error("No se encontraron ventas de este libro.");
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            else {
+                log.info("Devolviendo "+ventasDto.size()+" ventas encontradas de este libro.");
+                return ResponseEntity.ok(ventasDto);
+            }
+        } catch (WrongIdFormatException e) {
+            log.error("El código "+codLibro+" tiene un formato erróneo");
+            throw e;
         }
     }
 

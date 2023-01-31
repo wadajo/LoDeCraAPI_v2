@@ -1,6 +1,7 @@
 package com.lodecra.apiV1.service;
 
 import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
+import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Venta;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
@@ -39,9 +40,12 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public List<Venta> listarVentasDelLibro(String codLibro) {
-        return ventaRepository.todasLasVentasDelLibro(codLibro);
-
+    public List<Venta> listarVentasDelLibro(String codLibro) throws WrongIdFormatException {
+        if (codLibro.length()!=8) {
+            throw new WrongIdFormatException(codLibro);
+        } else {
+            return ventaRepository.todasLasVentasDelLibro(codLibro);
+        }
     }
 
     private Venta crearVentaAhora(String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException {
