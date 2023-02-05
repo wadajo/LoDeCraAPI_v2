@@ -7,6 +7,7 @@ import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 
@@ -27,11 +28,13 @@ public class LibroGraphqlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasRole('USER')")
     public Flux<BookDto> booksAvailable(){
         return listaDeLibrosAFluxDeDtos(libroService.getLibrosDisponibles());
     }
 
     @QueryMapping
+    @PreAuthorize("hasRole('USER')")
     public Flux<BookDto> booksContainingKeyword(@Argument String keyword){
         return listaDeLibrosAFluxDeDtos(libroService.getLibrosDisponiblesPorBusquedaGral(keyword));
     }

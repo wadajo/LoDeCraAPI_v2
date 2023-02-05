@@ -10,6 +10,7 @@ import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class EjemplarController {
     }
 
     @GetMapping("/ejemplares/{codLibro}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<EjemplarDto>> ejemplaresDelLibro(@PathVariable String codLibro){
         log.info("Llamando a GET /ejemplares/{codLibro} para libro con código "+codLibro);
         Optional<List<Ejemplar>> aDevolverOptional;
@@ -59,6 +61,7 @@ public class EjemplarController {
     }
 
     @PostMapping("/ejemplares/{codLibro}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EjemplarDto> agregarEjemplarNuevo (
             @PathVariable String codLibro,
             @RequestParam String modalidad,

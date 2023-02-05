@@ -8,6 +8,7 @@ import com.lodecra.apiV1.service.port.LibroService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class LibroController {
     }
 
     @GetMapping("/libros")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<BookDto>> librosDisponibles
             (@RequestParam(required = false) String keyword,
              @RequestParam(required = false) String campoABuscar){
@@ -53,6 +55,7 @@ public class LibroController {
     }
 
     @GetMapping("/libros/{codigo}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Optional<BookDto>> libroPorCodigo(@PathVariable String codigo){
         log.info("Llamando a GET /libros/{codigo} para libro con código "+codigo);
         Optional<Libro> aDevolver;
@@ -70,6 +73,7 @@ public class LibroController {
     }
 
     @PostMapping("/libros")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> nuevoLibro(@RequestBody Libro nuevo) {
         String titulo = nuevo.getTitulo();
         String autor = nuevo.getAutor();
@@ -87,6 +91,7 @@ public class LibroController {
     }
 
     @PutMapping("/libros/{codigo}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> editarLibro(@RequestBody Libro editado, @PathVariable String codigo) {
         log.info("Llamando a PUT /libros/{codigo} con libro de código "+codigo);
         try {
@@ -107,6 +112,7 @@ public class LibroController {
     }
 
     @DeleteMapping("/libros/{codigo}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> borrarLibro(@PathVariable String codigo) {
         log.info("Llamando a DELETE /libros/{codigo} con libro de código "+codigo);
         try {
