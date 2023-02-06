@@ -22,11 +22,11 @@ public interface LibroMapper {
     BookDto libroToBookDto(Libro libro);
 
     @Mapping(target = "codigo", source = "code")
-    @Mapping(target = "titulo", source = "name", defaultValue = "N/A")
-    @Mapping(target = "autor", source = "author", defaultValue = "N/A")
+    @Mapping(target = "titulo", source = "name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "autor", source = "author", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "precio", source = "price", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    @Mapping(target = "editorial", source = "publisher", defaultValue = "N/A")
-    @Mapping(target = "contacto", source = "contact", defaultValue = "N/A")
+    @Mapping(target = "editorial", source = "publisher", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "contacto", source = "contact", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "descartado", source = "discarded", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     Libro bookDtoToLibro(BookDto bookDto);

@@ -5,13 +5,18 @@ import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -75,6 +80,7 @@ public class LibroController {
     @PostMapping("/libros")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> nuevoLibro(@RequestBody Libro nuevo) {
+        // TODO marcar como Valid el libro y cambiar a BookDto
         String titulo = nuevo.getTitulo();
         String autor = nuevo.getAutor();
         log.info("Llamando a POST /libros con nuevo libro. Título: "+titulo+". Autor: "+autor+".");
@@ -92,23 +98,38 @@ public class LibroController {
 
     @PutMapping("/libros/{codigo}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BookDto> editarLibro(@RequestBody Libro editado, @PathVariable String codigo) {
+    public ResponseEntity<BookDto> editarLibro(@RequestBody @Valid BookDto editado, @PathVariable String codigo) {
         log.info("Llamando a PUT /libros/{codigo} con libro de código "+codigo);
         try {
             var libroExistente = libroService.getLibroPorCodigo(codigo);
             if(libroExistente.isPresent()) {
                 log.info("Encontrado en la Base. Título: "+libroExistente.get().getTitulo());
-                var guardado = libroService.editarLibro(editado,codigo);
+                var guardado = libroService.editarLibro(mapper.bookDtoToLibro(editado),codigo);
                 BookDto aDevolver = mapper.libroToBookDto(guardado.orElseThrow(()-> new BookNotFoundException(codigo)));
                 log.info("Actualizado libro. Título: " + aDevolver.name() + ". Autor: " + aDevolver.author() + ". Código: " + codigo);
                 return ResponseEntity.ok(aDevolver);
             } else {
                 return ResponseEntity.internalServerError().build();
             }
+        } catch (WrongIdFormatException e) {
+            log.error("El código "+codigo+" tiene un formato erróneo");
+            throw e;
         } catch (BookNotFoundException e) {
             log.error("No se encontró el libro con el código "+codigo);
             throw e;
         }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 
     @DeleteMapping("/libros/{codigo}")
@@ -128,6 +149,9 @@ public class LibroController {
             } else {
                 return ResponseEntity.internalServerError().build();
             }
+        } catch (WrongIdFormatException e) {
+            log.error("El código "+codigo+" tiene un formato erróneo");
+            throw e;
         } catch (BookNotFoundException e) {
             log.error("No se encontró el libro con el código "+codigo);
             throw e;
