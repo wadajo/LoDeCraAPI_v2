@@ -8,15 +8,15 @@ import com.lodecra.apiV1.service.port.LibroService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -121,14 +121,15 @@ public class LibroController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public List<ProblemDetail> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        var listaDeProblemas=new ArrayList<ProblemDetail>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
+            ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation error.");
             String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            problemDetail.setTitle("Error in field "+fieldName+": "+error.getDefaultMessage());
+            listaDeProblemas.add(problemDetail);
         });
-        return errors;
+        return listaDeProblemas;
     }
 
     @DeleteMapping("/libros/{codigo}")
