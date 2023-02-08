@@ -8,6 +8,7 @@ import com.lodecra.apiV1.repository.adapter.document.EjemplarMongo;
 import com.lodecra.apiV1.repository.port.EjemplarRepository;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -28,14 +29,14 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
 
     private final LibroRepository libroRepository;
 
-    private final EjemplarMapper mapper;
+    private final ConversionService conversionService;
 
     private final MongoTemplate mongoTemplate;
 
-    public EjemplarRepositoryImplMongo(EjemplarMongoRepository mongoRepository, LibroRepository libroRepository, EjemplarMapper mapper, MongoTemplate mongoTemplate) {
+    public EjemplarRepositoryImplMongo(EjemplarMongoRepository mongoRepository, LibroRepository libroRepository, ConversionService conversionService, MongoTemplate mongoTemplate) {
         this.mongoRepository = mongoRepository;
         this.libroRepository = libroRepository;
-        this.mapper = mapper;
+        this.conversionService = conversionService;
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -44,7 +45,7 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         var todosLosEjemplares=mongoRepository.findAllByCodLibro(codLibro);
         List<Ejemplar> listaEjemplar=new ArrayList<>();
         todosLosEjemplares.ifPresent(ejemplaresMongo -> ejemplaresMongo.forEach(
-                ejemplarMongo -> listaEjemplar.add(mapper.ejemplarMongoToEjemplar(ejemplarMongo))));
+                ejemplarMongo -> listaEjemplar.add(conversionService.convert(ejemplarMongo,Ejemplar.class))));
         return listaEjemplar.isEmpty() ?
                 Optional.empty() :
                 Optional.of(listaEjemplar);
@@ -52,24 +53,26 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
 
     @Override
     public Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer nroEjemplar) {
-        Ejemplar encontrado=null;
         var ejemplarADevolver=mongoRepository.findByCodLibroAndNroEjemplar(codLibro, nroEjemplar);
         if (ejemplarADevolver.isPresent()) {
             var libroAAnadir=libroRepository.obtenerLibroPorCodigo(codLibro);
             if (libroAAnadir.isPresent()) {
-                encontrado = mapper.ejemplarMongoToEjemplar(ejemplarADevolver.get());
-                encontrado.setLibro(libroAAnadir.get());
+                Ejemplar encontrado = conversionService.convert(ejemplarADevolver.get(),Ejemplar.class);
+                if (encontrado != null) {
+                    encontrado.setLibro(libroAAnadir.get());
+                    return Optional.of(encontrado);
+                }
             }
         }
-        return Optional.ofNullable(encontrado);
+        return Optional.empty();
     }
 
     @Transactional
     @Override
     public Ejemplar agregarEjemplar(Ejemplar nuevo) {
-        var agregado=mongoRepository.save(mapper.ejemplarToEjemplarMongo(nuevo));
+        var agregado=mongoRepository.save(conversionService.convert(nuevo,EjemplarMongo.class));
         var encontrado=mongoRepository.findByCodLibroAndNroEjemplar(agregado.codLibro(),agregado.nroEjemplar());
-        return mapper.ejemplarMongoToEjemplar(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())));
+        return conversionService.convert(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())),Ejemplar.class);
     }
 
     @Transactional

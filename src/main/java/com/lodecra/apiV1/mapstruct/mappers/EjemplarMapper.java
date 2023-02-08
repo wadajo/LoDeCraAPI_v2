@@ -3,7 +3,6 @@ package com.lodecra.apiV1.mapstruct.mappers;
 import com.lodecra.apiV1.dto.EjemplarDto;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Libro;
-import com.lodecra.apiV1.repository.adapter.document.EjemplarMongo;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,13 +24,5 @@ public interface EjemplarMapper {
     @Mapping(target = "modality", source = "ejemplar.modalidad")
     @Mapping(target = "added", expression = "java(java.time.LocalDateTime.parse(ejemplar.getAgregado().toString(), java.time.format.DateTimeFormatter.ISO_DATE_TIME).format(java.time.format.DateTimeFormatter.ofPattern(\"dd-MM-yy HH:mm\")))")
     EjemplarDto ejemplarAndLibroToEjemplarDto(Ejemplar ejemplar, Libro libro);
-
-    @Mapping(target = "libro.codigo", source = "codLibro")
-    Ejemplar ejemplarMongoToEjemplar(EjemplarMongo ejemplarMongo);
-
-    @Mapping(target = "vendidoFecha", ignore = true)
-    @Mapping(target = "precioVendido", ignore = true)
-    @Mapping(source = "libro.codigo", target = "codLibro")
-    EjemplarMongo ejemplarToEjemplarMongo(Ejemplar ejemplar);
 
 }
