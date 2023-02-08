@@ -6,9 +6,10 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.core.convert.converter.Converter;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface VentaMapper {
+public interface VentaMapper extends Converter<Venta,VentaDto> {
 
     @Mapping(target = "volume", source = "venta.ejemplarVendido")
     @Mapping(target = "volume.book.code", ignore = true)
@@ -25,6 +26,6 @@ public interface VentaMapper {
     @Mapping(target = "volume.added", source = "venta.ejemplarVendido.agregado")
     @Mapping(target = "dateSold", source = "venta.fechaHoraVendido")
     @Mapping(target = "priceSold", source = "venta.precioVendido")
-    VentaDto ventaToVentaDto(Venta venta);
+    VentaDto convert(Venta venta);
 
 }

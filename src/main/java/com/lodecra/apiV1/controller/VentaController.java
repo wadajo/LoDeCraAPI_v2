@@ -4,9 +4,9 @@ import com.lodecra.apiV1.dto.VentaDto;
 import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
 import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.exception.WrongVolumeNoException;
-import com.lodecra.apiV1.mapstruct.mappers.VentaMapper;
 import com.lodecra.apiV1.service.port.VentaService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,11 +24,11 @@ public class VentaController {
 
     private final VentaService ventaService;
 
-    private final VentaMapper ventaMapper;
+    private final ConversionService conversionService;
 
-    public VentaController(VentaService ventaService, VentaMapper ventaMapper) {
+    public VentaController(VentaService ventaService, ConversionService conversionService) {
         this.ventaService = ventaService;
-        this.ventaMapper = ventaMapper;
+        this.conversionService = conversionService;
     }
 
     @GetMapping("/ventas/{codLibro}")
@@ -37,7 +37,7 @@ public class VentaController {
         log.info("Llamando a GET /ventas para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
         try {
-            ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(ventaMapper.ventaToVentaDto(unaVenta)));
+            ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(conversionService.convert(unaVenta,VentaDto.class)));
             if (ventasDto.isEmpty()) {
                 log.error("No se encontraron ventas de este libro.");
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -58,7 +58,10 @@ public class VentaController {
             log.info("Llamando a POST /ventas para libro de código "+codLibro+" y ejemplar nro. "+nroEjemplar);
             var ventaHecha=ventaService.hacerVentaRapida(codLibro,nroEjemplar);
             log.info("Hecha la venta en fecha y hora: "+ventaHecha.getFechaHoraVendido().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault())));
-            return ResponseEntity.status(HttpStatus.CREATED).body(ventaMapper.ventaToVentaDto(ventaHecha));
+            return ResponseEntity.status(HttpStatus.CREATED).body(conversionService.convert(ventaHecha,VentaDto.class));
+        } catch (WrongIdFormatException e) {
+            log.error("El código "+codLibro+" tiene un formato erróneo");
+            throw e;
         } catch (WrongVolumeNoException e) {
             log.error("No se encontró el volumen "+nroEjemplar+" del libro con código "+codLibro);
             throw e;

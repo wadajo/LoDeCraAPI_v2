@@ -33,10 +33,14 @@ public class VentaServiceImpl implements VentaService {
 
 
     @Override
-    public Venta hacerVentaRapida(String codLibro, Integer nroEjemplar) {
-        Venta aHacer=crearVentaAhora(codLibro, nroEjemplar);
-        ejemplarRepository.venderEjemplar(aHacer);
-        return aHacer;
+    public Venta hacerVentaRapida(String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException,WrongIdFormatException {
+        if (codLibro.length()!=8) {
+            throw new WrongIdFormatException(codLibro);
+        } else {
+            Venta aHacer = crearVentaAhora(codLibro, nroEjemplar);
+            ejemplarRepository.venderEjemplar(aHacer);
+            return aHacer;
+        }
     }
 
     @Override

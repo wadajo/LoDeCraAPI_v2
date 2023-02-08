@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface VentaService {
 
-    Venta hacerVentaRapida (String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException;
+    Venta hacerVentaRapida (String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException,WrongIdFormatException;
 
     List<Venta> listarVentasDelLibro (String codLibro) throws WrongIdFormatException;
 
