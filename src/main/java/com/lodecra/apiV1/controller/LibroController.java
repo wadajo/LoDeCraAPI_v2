@@ -79,19 +79,18 @@ public class LibroController {
 
     @PostMapping("/libros")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BookDto> nuevoLibro(@RequestBody Libro nuevo) {
-        // TODO marcar como Valid el libro y cambiar a BookDto
-        String titulo = nuevo.getTitulo();
-        String autor = nuevo.getAutor();
+    public ResponseEntity<BookDto> nuevoLibro(@RequestBody @Valid BookDto nuevo) {
+        String titulo = nuevo.name();
+        String autor = nuevo.author();
         log.info("Llamando a POST /libros con nuevo libro. Título: "+titulo+". Autor: "+autor+".");
         Optional<Libro> guardado;
         try {
-            guardado = libroService.guardarNuevoLibro(nuevo);
-            BookDto aDevolver = mapper.libroToBookDto(guardado.orElseGet(Libro::new));
+            guardado = libroService.guardarNuevoLibro(mapper.bookDtoToLibro(nuevo));
+            var aDevolver = mapper.libroToBookDto(guardado.orElseThrow());
             log.info("Guardado nuevo libro. Título: "+titulo+". Autor: "+autor+". Código: "+aDevolver.code());
             return ResponseEntity.status(HttpStatus.CREATED).body(aDevolver);
         } catch (BookNotSavedException | DuplicatedBookException e) {
-            log.error("No se guardó el libro con título "+titulo+" y autor "+autor);
+            log.error("No se puedo guardar el libro con título "+titulo+" y autor "+autor);
             throw e;
         }
     }
