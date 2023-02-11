@@ -11,3 +11,4 @@ API para consulta y venta de libros para librería independiente de Buenos Aires
 - Exception Handling: ProblemDetail API
 - DTO to Model Mapping: Mapstruct
 - Validation: Jakarta Validation
+- Security: Spring Security
