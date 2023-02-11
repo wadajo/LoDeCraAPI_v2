@@ -2,7 +2,6 @@ package com.lodecra.apiV1.mapstruct.mappers;
 
 import com.lodecra.apiV1.dto.BookDto;
 import com.lodecra.apiV1.model.Libro;
-import com.lodecra.apiV1.repository.adapter.document.LibroMongo;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,12 +29,5 @@ public interface LibroMapper {
     @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     @Mapping(target = "descartado", source = "discarded", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     Libro bookDtoToLibro(BookDto bookDto);
-
-    @Mapping(target = "stock", source = "stock", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    @Mapping(target = "descartado", source = "descartado", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    Libro libroMongoToLibro(LibroMongo libroMongo);
-
-    @Mapping(target = "codigo", expression = "java(com.lodecra.apiV1.util.Utilidades.construirCodigo(55,titulo,autor))")
-    LibroMongo libroToLibroMongo(Libro libro);
 
 }
