@@ -8,10 +8,12 @@ import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface EjemplarMongoReverseMapper extends Converter<EjemplarMongo,Ejemplar> {
+public interface EjemplarEjemplarMongoMapper extends Converter<Ejemplar,EjemplarMongo> {
 
-    @Mapping(target = "libro.codigo", source = "codLibro")
+    @Mapping(target = "vendidoFecha", ignore = true)
+    @Mapping(target = "precioVendido", ignore = true)
+    @Mapping(source = "libro.codigo", target = "codLibro")
     @Override
-    Ejemplar convert(EjemplarMongo ejemplarMongo);
+    EjemplarMongo convert(Ejemplar ejemplar);
 
 }
