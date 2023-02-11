@@ -13,7 +13,7 @@ public class NoExistencesFoundException extends ErrorResponseException {
     }
 
     private static ProblemDetail asProblemDetail(String bookId) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "No se encontraron ejemplares del libro con código "+bookId);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "No se encontraron ejemplares disponibles o no vendidos del libro con código "+bookId);
         problemDetail.setTitle("No hay ejemplares disponibles");
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;

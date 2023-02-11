@@ -14,9 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/lodecra/v2")
@@ -39,16 +37,15 @@ public class EjemplarController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<EjemplarDto>> ejemplaresDelLibro(@PathVariable String codLibro){
         log.info("Llamando a GET /ejemplares/{codLibro} para libro con código "+codLibro);
-        Optional<List<Ejemplar>> aDevolverOptional;
+        List<Ejemplar> aDevolverEjemplar;
         List<EjemplarDto> aDevolver=new ArrayList<>();
         try {
             var libroBuscado = libroService.getLibroPorCodigo(codLibro);
-            aDevolverOptional = ejemplarService.getEjemplaresPorCodigoLibro(codLibro);
-            log.info("Encontrados "+aDevolverOptional.orElseGet(Collections::emptyList).size()+" ejemplares de este libro.");
-            if(aDevolverOptional.isPresent() && libroBuscado.isPresent()){
-                var listaDeEjemplares=aDevolverOptional.get();
+            aDevolverEjemplar = ejemplarService.getEjemplaresDisponiblesPorCodigo(codLibro);
+            log.info("Encontrados "+aDevolverEjemplar.size()+" ejemplares de este libro.");
+            if(!aDevolverEjemplar.isEmpty() && libroBuscado.isPresent()){
                 var libroCorrespondiente=libroBuscado.get();
-                listaDeEjemplares.forEach(ejemplar -> aDevolver.add(mapper.ejemplarAndLibroToEjemplarDto(ejemplar,libroCorrespondiente)));
+                aDevolverEjemplar.forEach(ejemplar -> aDevolver.add(mapper.ejemplarAndLibroToEjemplarDto(ejemplar,libroCorrespondiente)));
             }
         } catch (WrongIdFormatException e) {
             log.error("El código "+codLibro+" tiene un formato erróneo");

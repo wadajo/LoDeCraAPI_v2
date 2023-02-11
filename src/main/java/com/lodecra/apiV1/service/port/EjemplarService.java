@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface EjemplarService {
 
-    Optional<List<Ejemplar>> getEjemplaresPorCodigoLibro (String codLibro) throws WrongIdFormatException, BookNotFoundException;
+    List<Ejemplar> getEjemplaresDisponiblesPorCodigo(String codLibro) throws WrongIdFormatException, BookNotFoundException;
 
     Optional<Ejemplar> getEjemplarNro (String codLibro, Integer nroEjemplar) throws WrongVolumeNoException;
 

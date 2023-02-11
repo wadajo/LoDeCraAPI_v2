@@ -50,7 +50,7 @@ public class EjemplarControllerTest {
         Ejemplar ejemplar=new Ejemplar(libro,1,"Madrid","firme", LocalDateTime.now());
 
         given(libroService.getLibroPorCodigo(anyString())).willReturn(Optional.of(libro));
-        given(ejemplarService.getEjemplaresPorCodigoLibro(anyString())).willReturn(Optional.of(List.of(ejemplar)));
+        given(ejemplarService.getEjemplaresDisponiblesPorCodigo(anyString())).willReturn(List.of(ejemplar));
         given(mapper.ejemplarAndLibroToEjemplarDto(any(Ejemplar.class),any(Libro.class))).willReturn(new EjemplarDto(new BookDto("55_EmaAi","Ema, la cautiva","Aira",990,"EUDEBA",null,1,false),1,"Madrid","firme",LocalDateTime.now().toString()));
 
         mvc.perform(get(baseUrl+"/ejemplares/{codLibro}","55_EmaAi"))

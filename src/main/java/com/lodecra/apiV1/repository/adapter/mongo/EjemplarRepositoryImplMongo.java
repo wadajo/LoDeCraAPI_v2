@@ -1,7 +1,6 @@
 package com.lodecra.apiV1.repository.adapter.mongo;
 
 import com.lodecra.apiV1.exception.BookNotSavedException;
-import com.lodecra.apiV1.mapstruct.mappers.EjemplarMapper;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Venta;
 import com.lodecra.apiV1.repository.adapter.document.EjemplarMongo;
@@ -41,14 +40,26 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
     }
 
     @Override
-    public Optional<List<Ejemplar>> obtenerEjemplaresPorCodigoDeLibro(String codLibro) {
+    public List<Ejemplar> obtenerEjemplaresNoVendidosPorCodigo(String codLibro) {
         var todosLosEjemplares=mongoRepository.findAllByCodLibro(codLibro);
-        List<Ejemplar> listaEjemplar=new ArrayList<>();
+        List<Ejemplar> ejemplaresNoVendidos=new ArrayList<>();
         todosLosEjemplares.ifPresent(ejemplaresMongo -> ejemplaresMongo.forEach(
-                ejemplarMongo -> listaEjemplar.add(conversionService.convert(ejemplarMongo,Ejemplar.class))));
-        return listaEjemplar.isEmpty() ?
-                Optional.empty() :
-                Optional.of(listaEjemplar);
+                ejemplarMongo -> {
+                    if(null==ejemplarMongo.vendidoFecha())
+                        ejemplaresNoVendidos.add(conversionService.convert(ejemplarMongo,Ejemplar.class));
+                }));
+
+        return ejemplaresNoVendidos;
+    }
+
+    @Override
+    public List<Ejemplar> obtenerEjemplaresTotalesPorCodigo(String codLibro) {
+        var todosLosEjemplares=mongoRepository.findAllByCodLibro(codLibro);
+        List<Ejemplar> ejemplares=new ArrayList<>();
+        todosLosEjemplares.ifPresent(ejemplaresMongo -> ejemplaresMongo.forEach(
+                ejemplarMongo -> ejemplares.add(conversionService.convert(ejemplarMongo,Ejemplar.class))
+                ));
+        return ejemplares;
     }
 
     @Override
@@ -69,10 +80,10 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
 
     @Transactional
     @Override
-    public Ejemplar agregarEjemplar(Ejemplar nuevo) {
+    public void agregarEjemplar(Ejemplar nuevo) {
         var agregado=mongoRepository.save(conversionService.convert(nuevo,EjemplarMongo.class));
         var encontrado=mongoRepository.findByCodLibroAndNroEjemplar(agregado.codLibro(),agregado.nroEjemplar());
-        return conversionService.convert(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())),Ejemplar.class);
+        conversionService.convert(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())),Ejemplar.class);
     }
 
     @Transactional

@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,12 +28,12 @@ public class EjemplarServiceImpl implements EjemplarService {
     }
 
     @Override
-    public Optional<List<Ejemplar>> getEjemplaresPorCodigoLibro(String codLibro) throws WrongIdFormatException, BookNotFoundException {
+    public List<Ejemplar> getEjemplaresDisponiblesPorCodigo(String codLibro) throws WrongIdFormatException, BookNotFoundException {
         if (codLibro.length()!=8) {
             throw new WrongIdFormatException(codLibro);
         } else {
-            var encontrados= ejemplarRepository.obtenerEjemplaresPorCodigoDeLibro(codLibro);
-            if (encontrados.isPresent() && !encontrados.get().isEmpty())
+            var encontrados= ejemplarRepository.obtenerEjemplaresNoVendidosPorCodigo(codLibro);
+            if (!encontrados.isEmpty())
                 return encontrados;
             else
                 throw new NoExistencesFoundException(codLibro);
@@ -59,8 +58,7 @@ public class EjemplarServiceImpl implements EjemplarService {
         Ejemplar construido=new Ejemplar();
         var libro=libroRepository.obtenerLibroPorCodigo(codLibro);
         AtomicInteger cantEjemplares = new AtomicInteger (ejemplarRepository
-                .obtenerEjemplaresPorCodigoDeLibro(codLibro)
-                .orElseGet(ArrayList::new)
+                .obtenerEjemplaresTotalesPorCodigo(codLibro)
                 .size());
         if (libro.isPresent()) {
             construido.setLibro(libro.get());

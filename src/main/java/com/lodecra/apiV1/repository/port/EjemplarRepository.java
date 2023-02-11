@@ -8,11 +8,13 @@ import java.util.Optional;
 
 public interface EjemplarRepository {
 
-    Optional<List<Ejemplar>> obtenerEjemplaresPorCodigoDeLibro(String codLibro);
+    List<Ejemplar> obtenerEjemplaresNoVendidosPorCodigo(String codLibro);
+
+    List<Ejemplar> obtenerEjemplaresTotalesPorCodigo(String codLibro);
 
     Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer numEjemplar);
 
-    Ejemplar agregarEjemplar(Ejemplar nuevo);
+    void agregarEjemplar(Ejemplar nuevo);
 
     void venderEjemplar(Venta ventaAHacer);
 }
