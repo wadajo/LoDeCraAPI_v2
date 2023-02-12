@@ -10,7 +10,7 @@ public interface EjemplarRepository {
 
     List<Ejemplar> obtenerEjemplaresNoVendidosPorCodigo(String codLibro);
 
-    List<Ejemplar> obtenerEjemplaresTotalesPorCodigo(String codLibro);
+    Integer obtenerCantidadDeEjemplaresTotalesPorCodigo(String codLibro);
 
     Optional<Ejemplar> obtenerEjemplarNro(String codLibro, Integer numEjemplar);
 

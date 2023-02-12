@@ -58,8 +58,7 @@ public class EjemplarServiceImpl implements EjemplarService {
         Ejemplar construido=new Ejemplar();
         var libro=libroRepository.obtenerLibroPorCodigo(codLibro);
         AtomicInteger cantEjemplares = new AtomicInteger (ejemplarRepository
-                .obtenerEjemplaresTotalesPorCodigo(codLibro)
-                .size());
+                .obtenerCantidadDeEjemplaresTotalesPorCodigo(codLibro));
         if (libro.isPresent()) {
             construido.setLibro(libro.get());
             construido.setModalidad(modalidad);

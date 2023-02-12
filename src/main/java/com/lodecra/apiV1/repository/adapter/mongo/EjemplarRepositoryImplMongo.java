@@ -53,13 +53,11 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
     }
 
     @Override
-    public List<Ejemplar> obtenerEjemplaresTotalesPorCodigo(String codLibro) {
-        var todosLosEjemplares=mongoRepository.findAllByCodLibro(codLibro);
-        List<Ejemplar> ejemplares=new ArrayList<>();
-        todosLosEjemplares.ifPresent(ejemplaresMongo -> ejemplaresMongo.forEach(
-                ejemplarMongo -> ejemplares.add(conversionService.convert(ejemplarMongo,Ejemplar.class))
-                ));
-        return ejemplares;
+    public Integer obtenerCantidadDeEjemplaresTotalesPorCodigo(String codLibro) {
+        Query query=new Query();
+        query.addCriteria(where("codLibro").is(codLibro));
+        var cantEjemplares=mongoTemplate.count(query,EjemplarMongo.class);
+        return Integer.parseInt(String.valueOf(cantEjemplares));
     }
 
     @Override
