@@ -2,15 +2,16 @@ package com.lodecra.apiV1.controller;
 
 import com.lodecra.apiV1.dto.EjemplarDto;
 import com.lodecra.apiV1.exception.BookNotFoundException;
-import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.mapstruct.mappers.EjemplarMapper;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.service.port.EjemplarService;
 import com.lodecra.apiV1.service.port.LibroService;
+import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,8 +19,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lodecra/v2")
-@Slf4j
-public class EjemplarController {
+@Slf4j(topic = "LoDeCraLogger")
+@Validated
+public class EjemplarController extends BaseController {
 
     private final EjemplarService ejemplarService;
 
@@ -35,7 +37,7 @@ public class EjemplarController {
 
     @GetMapping("/ejemplares/{codLibro}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<EjemplarDto>> ejemplaresDelLibro(@PathVariable String codLibro){
+    public ResponseEntity<List<EjemplarDto>> ejemplaresDelLibro(@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro){
         log.info("Llamando a GET /ejemplares/{codLibro} para libro con código "+codLibro);
         List<Ejemplar> aDevolverEjemplar;
         List<EjemplarDto> aDevolver=new ArrayList<>();
@@ -47,9 +49,6 @@ public class EjemplarController {
                 var libroCorrespondiente=libroBuscado.get();
                 aDevolverEjemplar.forEach(ejemplar -> aDevolver.add(mapper.ejemplarAndLibroToEjemplarDto(ejemplar,libroCorrespondiente)));
             }
-        } catch (WrongIdFormatException e) {
-            log.error("El código "+codLibro+" tiene un formato erróneo");
-            throw e;
         } catch (BookNotFoundException e) {
             log.error("No se encontró el libro con código "+codLibro);
             throw e;
@@ -60,7 +59,7 @@ public class EjemplarController {
     @PostMapping("/ejemplares/{codLibro}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EjemplarDto> agregarEjemplarNuevo (
-            @PathVariable String codLibro,
+            @Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro,
             @RequestParam String modalidad,
             @RequestParam String ubicacion) {
         log.info("Llamando a POST /ejemplares/"+codLibro+" para nuevo ejemplar.");
@@ -68,9 +67,6 @@ public class EjemplarController {
         try{
             guardado=ejemplarService.guardarNuevoEjemplar(codLibro,ubicacion,modalidad);
             log.info("Guardado el ejemplar nro. "+guardado.getNroEjemplar()+" de libro de código "+guardado.getLibro().getCodigo());
-        } catch (WrongIdFormatException e) {
-            log.error("El código "+codLibro+" tiene un formato erróneo");
-            throw e;
         } catch (BookNotFoundException e) {
             log.error("No se encontró el libro con código "+codLibro);
             throw e;
