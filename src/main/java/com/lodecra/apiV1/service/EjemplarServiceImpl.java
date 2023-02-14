@@ -28,16 +28,12 @@ public class EjemplarServiceImpl implements EjemplarService {
     }
 
     @Override
-    public List<Ejemplar> getEjemplaresDisponiblesPorCodigo(String codLibro) throws WrongIdFormatException, BookNotFoundException {
-        if (codLibro.length()!=8) {
-            throw new WrongIdFormatException(codLibro);
-        } else {
-            var encontrados= ejemplarRepository.obtenerEjemplaresNoVendidosPorCodigo(codLibro);
-            if (!encontrados.isEmpty())
-                return encontrados;
-            else
-                throw new NoExistencesFoundException(codLibro);
-        }
+    public List<Ejemplar> getEjemplaresDisponiblesPorCodigo(String codLibro) throws BookNotFoundException {
+        var encontrados= ejemplarRepository.obtenerEjemplaresNoVendidosPorCodigo(codLibro);
+        if (!encontrados.isEmpty())
+            return encontrados;
+        else
+            throw new NoExistencesFoundException(codLibro);
     }
 
     @Override
@@ -52,9 +48,6 @@ public class EjemplarServiceImpl implements EjemplarService {
     @Transactional
     @Override
     public Ejemplar guardarNuevoEjemplar(String codLibro, String ubicacion, String modalidad) throws BookNotSavedException {
-        if (codLibro.length()!=8) {
-            throw new WrongIdFormatException(codLibro);
-        }
         Ejemplar construido=new Ejemplar();
         var libro=libroRepository.obtenerLibroPorCodigo(codLibro);
         AtomicInteger cantEjemplares = new AtomicInteger (ejemplarRepository

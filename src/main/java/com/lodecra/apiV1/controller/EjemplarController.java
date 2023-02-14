@@ -60,8 +60,8 @@ public class EjemplarController extends BaseController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EjemplarDto> agregarEjemplarNuevo (
             @Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro,
-            @RequestParam String modalidad,
-            @RequestParam String ubicacion) {
+            @RequestParam("modality") String modalidad,
+            @RequestParam("location") String ubicacion) {
         log.info("Llamando a POST /ejemplares/"+codLibro+" para nuevo ejemplar.");
         Ejemplar guardado;
         try{

@@ -3,7 +3,6 @@ package com.lodecra.apiV1.service;
 import com.lodecra.apiV1.exception.BookNotFoundException;
 import com.lodecra.apiV1.exception.DuplicatedBookException;
 import com.lodecra.apiV1.exception.EmptySearchException;
-import com.lodecra.apiV1.exception.WrongIdFormatException;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.service.port.LibroService;
@@ -54,16 +53,12 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
-    public Optional<Libro> getLibroPorCodigo(String codigo) {
-        if (codigo.length()!=8) {
-            throw new WrongIdFormatException(codigo);
-        } else {
-            Optional<Libro> encontrado=repository.obtenerLibroPorCodigo(codigo);
-            if (encontrado.isPresent())
-                return encontrado;
-            else
-                throw new BookNotFoundException(codigo);
-        }
+    public Optional<Libro> getLibroPorCodigo(String codLibro) {
+        Optional<Libro> encontrado=repository.obtenerLibroPorCodigo(codLibro);
+        if (encontrado.isPresent())
+            return encontrado;
+        else
+            throw new BookNotFoundException(codLibro);
     }
 
     @Transactional
@@ -84,19 +79,19 @@ public class LibroServiceImpl implements LibroService {
 
     @Transactional
     @Override
-    public Optional<Libro> editarLibro(Libro editadoSinCodigo, String codigo) {
-        if (getLibroPorCodigo(codigo).isPresent())
-            return repository.editarLibroExistente(editadoSinCodigo,codigo);
+    public Optional<Libro> editarLibro(Libro editadoSinCodigo, String codLibro) {
+        if (getLibroPorCodigo(codLibro).isPresent())
+            return repository.editarLibroExistente(editadoSinCodigo,codLibro);
         else
-            throw new BookNotFoundException(codigo);
+            throw new BookNotFoundException(codLibro);
     }
 
     @Transactional
     @Override
-    public void descartarLibro(String codigo) {
-        if (getLibroPorCodigo(codigo).isPresent())
-            repository.descartarLibro(codigo);
+    public void descartarLibro(String codLibro) {
+        if (getLibroPorCodigo(codLibro).isPresent())
+            repository.descartarLibro(codLibro);
         else
-            throw new BookNotFoundException(codigo);
+            throw new BookNotFoundException(codLibro);
     }
 }

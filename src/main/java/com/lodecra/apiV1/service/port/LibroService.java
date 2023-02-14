@@ -14,13 +14,13 @@ public interface LibroService {
 
     List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) throws EmptySearchException;
 
-    Optional<Libro> getLibroPorCodigo (String codigo) throws WrongIdFormatException, BookNotFoundException;
+    Optional<Libro> getLibroPorCodigo (String codLibro) throws BookNotFoundException;
 
     Optional<Libro> guardarNuevoLibro (Libro aGuardar) throws BookNotSavedException, DuplicatedBookException;
 
     boolean existeLibroConMismoTituloYAutor(String titulo, String autor);
 
-    Optional<Libro> editarLibro(Libro editadoSinCodigo, String codigo);
+    Optional<Libro> editarLibro(Libro editadoSinCodigo, String codLibro);
 
-    void descartarLibro(String codigo);
+    void descartarLibro(String codLibro);
 }
