@@ -1,5 +1,6 @@
 package com.lodecra.apiV1.service;
 
+import com.lodecra.apiV1.exception.BookNotSoldException;
 import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
 import com.lodecra.apiV1.model.Ejemplar;
 import com.lodecra.apiV1.model.Venta;
@@ -30,34 +31,29 @@ public class VentaServiceImpl implements VentaService {
         this.ejemplarRepository = ejemplarRepository;
     }
 
-
     @Override
-    public Venta hacerVentaRapida(String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException {
-        Venta aHacer = crearVentaAhora(codLibro, nroEjemplar);
-        ejemplarRepository.venderEjemplar(aHacer);
-        return aHacer;
+    public Venta hacerVenta(String codLibro, Integer nroEjemplar, Integer precioVendido, LocalDateTime fechaHoraVendido) throws VolumeAlreadySoldException, BookNotSoldException{
+        if (ventaRepository.estaVendido(codLibro, nroEjemplar)) {
+            throw new VolumeAlreadySoldException(codLibro, nroEjemplar);
+        }
+        var ejemplarExistenteOptional=ejemplarService.getEjemplarNro(codLibro, nroEjemplar);
+        if (ejemplarExistenteOptional.isPresent()){
+            Ejemplar ejemplarExistente=ejemplarExistenteOptional.get();
+            Venta aHacer = new Venta(
+                    ejemplarExistente,
+                    null!=fechaHoraVendido?fechaHoraVendido:LocalDateTime.now(ZoneId.systemDefault()),
+                    null!=precioVendido?precioVendido:ejemplarExistente.getLibro().getPrecio()
+            );
+            ejemplarRepository.venderEjemplar(aHacer);
+            return aHacer;
+        } else {
+            throw new BookNotSoldException(codLibro, nroEjemplar);
+        }
     }
 
     @Override
     public List<Venta> listarVentasDelLibro(String codLibro) {
         return ventaRepository.todasLasVentasDelLibro(codLibro);
     }
-
-    private Venta crearVentaAhora(String codLibro, Integer nroEjemplar) throws VolumeAlreadySoldException {
-        if (ventaRepository.estaVendido(codLibro, nroEjemplar))
-            throw new VolumeAlreadySoldException(codLibro,nroEjemplar);
-
-        var ejemplarExistenteOptional=ejemplarService.getEjemplarNro(codLibro, nroEjemplar);
-        Ejemplar ejemplarExistente=new Ejemplar();
-        if (ejemplarExistenteOptional.isPresent()){
-            ejemplarExistente=ejemplarExistenteOptional.get();
-        }
-        return new Venta(
-                ejemplarExistente,
-                LocalDateTime.now(ZoneId.systemDefault()),
-                ejemplarExistente.getLibro().getPrecio()
-        );
-    }
-
 
 }

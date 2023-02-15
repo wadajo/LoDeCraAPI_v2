@@ -3,6 +3,7 @@ package com.lodecra.apiV1.controller;
 import com.lodecra.apiV1.dto.VentaDto;
 import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
 import com.lodecra.apiV1.exception.WrongVolumeNoException;
+import com.lodecra.apiV1.model.Venta;
 import com.lodecra.apiV1.service.port.VentaService;
 import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +35,10 @@ public class VentaController extends BaseController {
         this.conversionService = conversionService;
     }
 
-    @GetMapping("/ventas/{codLibro}")
+    @GetMapping("/sales/{code}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro) {
-        log.info("Llamando a GET /ventas para libro de código "+codLibro);
+    public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable("code") String codLibro) {
+        log.info("Llamando a GET /sales para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
         ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(conversionService.convert(unaVenta,VentaDto.class)));
         if (ventasDto.isEmpty()) {
@@ -48,14 +50,24 @@ public class VentaController extends BaseController {
             return ResponseEntity.ok(ventasDto);
         }
     }
-    @PostMapping("/ventas/{codLibro}")
+    @PostMapping("/sales/{code}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<VentaDto> hacerVentaRapida (@PathVariable String codLibro, @RequestParam Integer nroEjemplar){
+    public ResponseEntity<VentaDto> hacerVenta(@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable("code") String codLibro,
+                                               @RequestParam("volumeNum") Integer nroEjemplar,
+                                               @RequestParam(required = false, name = "price") Integer precioVendido,
+                                               @RequestParam(required = false, name = "dateSold")  LocalDateTime fechaHoraVendido){
         try{
-            log.info("Llamando a POST /ventas para libro de código "+codLibro+" y ejemplar nro. "+nroEjemplar);
-            var ventaHecha=ventaService.hacerVentaRapida(codLibro,nroEjemplar);
-            log.info("Hecha la venta en fecha y hora: "+ventaHecha.getFechaHoraVendido().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault())));
-            return ResponseEntity.status(HttpStatus.CREATED).body(conversionService.convert(ventaHecha,VentaDto.class));
+            log.info("Llamando a POST /sales para libro de código "+codLibro+" y ejemplar nro. "+nroEjemplar);
+            if(null==precioVendido&&null==fechaHoraVendido) {
+                log.info("Venta rápida a precio de lista y fecha actual.");
+            } else if(null==precioVendido) {
+                log.info("Venta especial, en fecha: "+fechaHoraVendido.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault()))+".");
+            } else if(null==fechaHoraVendido) {
+                log.info("Venta especial al precio: "+precioVendido+" pesos.");
+            }
+                Venta hecha=ventaService.hacerVenta(codLibro, nroEjemplar, precioVendido, fechaHoraVendido);
+                log.info("Hecha la venta en fecha y hora: " + hecha.getFechaHoraVendido().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault())));
+                return ResponseEntity.status(HttpStatus.CREATED).body(conversionService.convert(hecha, VentaDto.class));
         } catch (WrongVolumeNoException e) {
             log.error("No se encontró el volumen "+nroEjemplar+" del libro con código "+codLibro);
             throw e;
