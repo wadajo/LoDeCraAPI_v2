@@ -1,6 +1,5 @@
 package com.lodecra.apiV1.repository.adapter.mongo;
 
-import com.lodecra.apiV1.mapstruct.mappers.LibroMapper;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.adapter.document.LibroMongo;
 import com.lodecra.apiV1.repository.port.LibroRepository;
@@ -27,13 +26,13 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 public class LibroRepositoryImplMongo implements LibroRepository {
     private final LibroMongoRepository mongoRepository;
 
-    private final ConversionService conversionService;
+    private final ConversionService cs;
 
     private final MongoTemplate mongoTemplate;
 
-    public LibroRepositoryImplMongo(LibroMongoRepository mongoRepository, LibroMapper mapper, ConversionService conversionService, MongoTemplate mongoTemplate) {
+    public LibroRepositoryImplMongo(LibroMongoRepository mongoRepository, ConversionService cs, MongoTemplate mongoTemplate) {
         this.mongoRepository = mongoRepository;
-        this.conversionService = conversionService;
+        this.cs = cs;
         this.mongoTemplate = mongoTemplate;
     }
     @Override
@@ -65,24 +64,24 @@ public class LibroRepositoryImplMongo implements LibroRepository {
     @Override
     public Optional<Libro> obtenerLibroPorCodigo(String codigo) {
         var aDevolver = mongoRepository.findByCodigo(codigo);
-        return aDevolver.map(libroMongo -> conversionService.convert(libroMongo, Libro.class));
+        return aDevolver.map(libroMongo -> cs.convert(libroMongo, Libro.class));
     }
 
     @Transactional
     @Override
     public Optional<Libro> crearNuevoLibro(Libro nuevo) {
-        var posibleAGuardar=conversionService.convert(nuevo,LibroMongo.class);
+        var posibleAGuardar= cs.convert(nuevo,LibroMongo.class);
         String codigoDefault=posibleAGuardar.codigo();
         int prefix= Integer.parseInt(codigoDefault.substring(0,2));
         while (existeLibroConMismoCodigo(codigoDefault)){
             codigoDefault= Utilidades.construirCodigo(++prefix,posibleAGuardar.titulo(),posibleAGuardar.autor());
-            Libro cambiado=conversionService.convert(posibleAGuardar,Libro.class);
+            Libro cambiado= cs.convert(posibleAGuardar,Libro.class);
             cambiado.setCodigo(codigoDefault);
             posibleAGuardar=new LibroMongo(cambiado.getCodigo(), cambiado.getTitulo(), cambiado.getAutor(), cambiado.getPrecio(), cambiado.getEditorial(), cambiado.getContacto(), cambiado.getStock(), cambiado.getDescartado());
         }
         LibroMongo creado = mongoRepository.save(posibleAGuardar);
         var guardado=mongoRepository.findByCodigo(creado.codigo());
-        return guardado.map(libromongo -> conversionService.convert(libromongo,Libro.class));
+        return guardado.map(libromongo -> cs.convert(libromongo,Libro.class));
     }
 
     @Override
@@ -91,7 +90,7 @@ public class LibroRepositoryImplMongo implements LibroRepository {
         var posible = todosLosLibrosMongo.stream().filter(libro ->
                 (null != libro.autor() && libro.autor().equalsIgnoreCase(autor)) && (null != libro.titulo() && libro.titulo().equalsIgnoreCase(titulo))
         ).findAny();
-        return posible.map(libroMongo -> conversionService.convert(libroMongo,Libro.class));
+        return posible.map(libroMongo -> cs.convert(libroMongo,Libro.class));
     }
 
     @Transactional
@@ -105,7 +104,7 @@ public class LibroRepositoryImplMongo implements LibroRepository {
                     .matching(query(where("codigo").is(codLibro)))
                     .replaceWith(nuevo)
                     .findAndReplace();
-            aDevolver = Optional.ofNullable(conversionService.convert(nuevo,Libro.class));
+            aDevolver = Optional.ofNullable(cs.convert(nuevo,Libro.class));
         }
         return aDevolver;
     }
@@ -137,7 +136,7 @@ public class LibroRepositoryImplMongo implements LibroRepository {
 
     private List<Libro> convertirListaLibrosMongoALibros(List<LibroMongo> original){
         List<Libro> aDevolver = new ArrayList<>();
-        original.forEach(libroMongo -> aDevolver.add(conversionService.convert(libroMongo,Libro.class)));
+        original.forEach(libroMongo -> aDevolver.add(cs.convert(libroMongo,Libro.class)));
         return aDevolver;
     }
 

@@ -28,14 +28,14 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
 
     private final LibroRepository libroRepository;
 
-    private final ConversionService conversionService;
+    private final ConversionService cs;
 
     private final MongoTemplate mongoTemplate;
 
-    public EjemplarRepositoryImplMongo(EjemplarMongoRepository mongoRepository, LibroRepository libroRepository, ConversionService conversionService, MongoTemplate mongoTemplate) {
+    public EjemplarRepositoryImplMongo(EjemplarMongoRepository mongoRepository, LibroRepository libroRepository, ConversionService cs, MongoTemplate mongoTemplate) {
         this.mongoRepository = mongoRepository;
         this.libroRepository = libroRepository;
-        this.conversionService = conversionService;
+        this.cs = cs;
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -46,7 +46,7 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         todosLosEjemplares.ifPresent(ejemplaresMongo -> ejemplaresMongo.forEach(
                 ejemplarMongo -> {
                     if(null==ejemplarMongo.vendidoFecha())
-                        ejemplaresNoVendidos.add(conversionService.convert(ejemplarMongo,Ejemplar.class));
+                        ejemplaresNoVendidos.add(cs.convert(ejemplarMongo,Ejemplar.class));
                 }));
 
         return ejemplaresNoVendidos;
@@ -66,7 +66,7 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
         if (ejemplarADevolver.isPresent()) {
             var libroAAnadir=libroRepository.obtenerLibroPorCodigo(codLibro);
             if (libroAAnadir.isPresent()) {
-                Ejemplar encontrado = conversionService.convert(ejemplarADevolver.get(),Ejemplar.class);
+                Ejemplar encontrado = cs.convert(ejemplarADevolver.get(),Ejemplar.class);
                 if (encontrado != null) {
                     encontrado.setLibro(libroAAnadir.get());
                     return Optional.of(encontrado);
@@ -79,9 +79,9 @@ public class EjemplarRepositoryImplMongo implements EjemplarRepository {
     @Transactional
     @Override
     public void agregarEjemplar(Ejemplar nuevo) {
-        var agregado=mongoRepository.save(conversionService.convert(nuevo,EjemplarMongo.class));
+        var agregado=mongoRepository.save(cs.convert(nuevo,EjemplarMongo.class));
         var encontrado=mongoRepository.findByCodLibroAndNroEjemplar(agregado.codLibro(),agregado.nroEjemplar());
-        conversionService.convert(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())),Ejemplar.class);
+        cs.convert(encontrado.orElseThrow(()->new BookNotSavedException(nuevo.getLibro().getTitulo())),Ejemplar.class);
     }
 
     @Transactional

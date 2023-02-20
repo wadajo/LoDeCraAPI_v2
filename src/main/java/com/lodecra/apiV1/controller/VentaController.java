@@ -28,11 +28,11 @@ public class VentaController extends BaseController {
 
     private final VentaService ventaService;
 
-    private final ConversionService conversionService;
+    private final ConversionService cs;
 
-    public VentaController(VentaService ventaService, ConversionService conversionService) {
+    public VentaController(VentaService ventaService, ConversionService cs) {
         this.ventaService = ventaService;
-        this.conversionService = conversionService;
+        this.cs = cs;
     }
 
     @GetMapping("/sales/{code}")
@@ -40,7 +40,7 @@ public class VentaController extends BaseController {
     public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable("code") String codLibro) {
         log.info("Llamando a GET /sales para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
-        ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(conversionService.convert(unaVenta,VentaDto.class)));
+        ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(cs.convert(unaVenta,VentaDto.class)));
         if (ventasDto.isEmpty()) {
             log.error("No se encontraron ventas de este libro.");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -67,7 +67,7 @@ public class VentaController extends BaseController {
             }
                 Venta hecha=ventaService.hacerVenta(codLibro, nroEjemplar, precioVendido, fechaHoraVendido);
                 log.info("Hecha la venta en fecha y hora: " + hecha.getFechaHoraVendido().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault())));
-                return ResponseEntity.status(HttpStatus.CREATED).body(conversionService.convert(hecha, VentaDto.class));
+                return ResponseEntity.status(HttpStatus.CREATED).body(cs.convert(hecha, VentaDto.class));
         } catch (WrongVolumeNoException e) {
             log.error("No se encontró el volumen "+nroEjemplar+" del libro con código "+codLibro);
             throw e;
