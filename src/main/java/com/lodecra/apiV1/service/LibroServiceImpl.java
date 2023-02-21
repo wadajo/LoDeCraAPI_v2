@@ -6,6 +6,9 @@ import com.lodecra.apiV1.exception.EmptySearchException;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.service.port.LibroService;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.annotation.Observed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,20 +19,28 @@ import java.util.Optional;
 @Service
 public class LibroServiceImpl implements LibroService {
 
-    LibroRepository repository;
+    private final LibroRepository repository;
 
-    public LibroServiceImpl(LibroRepository repository) {
+    private final ObservationRegistry observationRegistry;
+
+    public LibroServiceImpl(LibroRepository repository, ObservationRegistry observationRegistry) {
         this.repository = repository;
+        this.observationRegistry = observationRegistry;
     }
 
     @Override
+    @Observed(name = "libros-disponibles")
     public List<Libro> getLibrosDisponibles() throws EmptySearchException{
-        var encontrados=repository.obtenerTodosLosLibrosDisponibles();
-        if (encontrados.isEmpty()){
-            throw new EmptySearchException();
-        } else {
-            return encontrados.get();
-        }
+        return Observation
+                .createNotStarted("libros-disponibles", observationRegistry)
+                .observe(()->{
+                    var encontrados=repository.obtenerTodosLosLibrosDisponibles();
+                    if (encontrados.isEmpty()){
+                        throw new EmptySearchException();
+                    } else {
+                        return encontrados.get();
+                    }
+                        });
     }
 
     @Override
