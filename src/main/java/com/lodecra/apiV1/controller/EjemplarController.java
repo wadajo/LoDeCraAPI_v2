@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/lodecra/v2")
+@RequestMapping("${lodecra.baseUrl}")
 @Slf4j(topic = "LoDeCraLogger")
 @Validated
 public class EjemplarController extends BaseController {

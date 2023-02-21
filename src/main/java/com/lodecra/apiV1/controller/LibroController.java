@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/lodecra/v2")
+@RequestMapping("${lodecra.baseUrl}")
 @Slf4j(topic = "LoDeCraLogger")
 @Validated
 public class LibroController extends BaseController {

@@ -8,6 +8,7 @@ import com.lodecra.apiV1.repository.port.EjemplarRepository;
 import com.lodecra.apiV1.repository.port.VentaRepository;
 import com.lodecra.apiV1.service.port.EjemplarService;
 import com.lodecra.apiV1.service.port.VentaService;
+import io.micrometer.observation.annotation.Observed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Transactional(readOnly = true)
 @Service
+@Observed(name = "service-ventas")
 public class VentaServiceImpl implements VentaService {
 
     private final EjemplarService ejemplarService;
@@ -32,6 +34,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
+    @Observed(name = "nueva-venta")
     public Venta hacerVenta(String codLibro, Integer nroEjemplar, Integer precioVendido, LocalDateTime fechaHoraVendido) throws VolumeAlreadySoldException, BookNotSoldException{
         if (ventaRepository.estaVendido(codLibro, nroEjemplar)) {
             throw new VolumeAlreadySoldException(codLibro, nroEjemplar);
@@ -52,6 +55,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
+    @Observed(name = "ventas-hechas-por-codigo")
     public List<Venta> listarVentasDelLibro(String codLibro) {
         return ventaRepository.todasLasVentasDelLibro(codLibro);
     }

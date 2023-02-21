@@ -6,8 +6,6 @@ import com.lodecra.apiV1.exception.EmptySearchException;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.repository.port.LibroRepository;
 import com.lodecra.apiV1.service.port.LibroService;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.annotation.Observed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,33 +15,28 @@ import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service
+@Observed(name = "service-libros")
 public class LibroServiceImpl implements LibroService {
 
     private final LibroRepository repository;
 
-    private final ObservationRegistry observationRegistry;
-
-    public LibroServiceImpl(LibroRepository repository, ObservationRegistry observationRegistry) {
+    public LibroServiceImpl(LibroRepository repository) {
         this.repository = repository;
-        this.observationRegistry = observationRegistry;
     }
 
     @Override
     @Observed(name = "libros-disponibles")
     public List<Libro> getLibrosDisponibles() throws EmptySearchException{
-        return Observation
-                .createNotStarted("libros-disponibles", observationRegistry)
-                .observe(()->{
-                    var encontrados=repository.obtenerTodosLosLibrosDisponibles();
-                    if (encontrados.isEmpty()){
-                        throw new EmptySearchException();
-                    } else {
-                        return encontrados.get();
-                    }
-                        });
+        var encontrados=repository.obtenerTodosLosLibrosDisponibles();
+        if (encontrados.isEmpty()){
+            throw new EmptySearchException();
+        } else {
+            return encontrados.get();
+        }
     }
 
     @Override
+    @Observed(name = "libros-busqueda-gral")
     public List<Libro> getLibrosDisponiblesPorBusquedaGral(String keyword) {
         var encontrados=repository.obtenerLibrosDisponiblesPorBusquedaGeneral(keyword);
         if (encontrados.isEmpty()){
@@ -54,6 +47,7 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
+    @Observed(name = "libros-busqueda-avz")
     public List<Libro> getLibrosPorBusquedaAvz(String keyword, String campoABuscar) {
         var encontrados=repository.obtenerLibrosPorBusquedaAvz(keyword, campoABuscar);
         if (encontrados.isEmpty()){
@@ -64,6 +58,7 @@ public class LibroServiceImpl implements LibroService {
     }
 
     @Override
+    @Observed(name = "libro-por-codigo")
     public Optional<Libro> getLibroPorCodigo(String codLibro) {
         Optional<Libro> encontrado=repository.obtenerLibroPorCodigo(codLibro);
         if (encontrado.isPresent())
@@ -74,6 +69,7 @@ public class LibroServiceImpl implements LibroService {
 
     @Transactional
     @Override
+    @Observed(name = "nuevo-libro")
     public Optional<Libro> guardarNuevoLibro(Libro aGuardar) {
         if (!existeLibroConMismoTituloYAutor(aGuardar.getTitulo(), aGuardar.getAutor()))
             return repository.crearNuevoLibro(aGuardar);
@@ -90,6 +86,7 @@ public class LibroServiceImpl implements LibroService {
 
     @Transactional
     @Override
+    @Observed(name = "editar-libro")
     public Optional<Libro> editarLibro(Libro editadoSinCodigo, String codLibro) {
         if (getLibroPorCodigo(codLibro).isPresent())
             return repository.editarLibroExistente(editadoSinCodigo,codLibro);
@@ -99,6 +96,7 @@ public class LibroServiceImpl implements LibroService {
 
     @Transactional
     @Override
+    @Observed(name = "descartar-libro")
     public void descartarLibro(String codLibro) {
         if (getLibroPorCodigo(codLibro).isPresent())
             repository.descartarLibro(codLibro);

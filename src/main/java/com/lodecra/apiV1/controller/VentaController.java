@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 @RestController
-@RequestMapping("/api/lodecra/v2")
+@RequestMapping("${lodecra.baseUrl}")
 @Slf4j(topic = "LoDeCraLogger")
 @Validated
 public class VentaController extends BaseController {
