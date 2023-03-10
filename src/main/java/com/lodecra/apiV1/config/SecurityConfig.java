@@ -1,14 +1,17 @@
 package com.lodecra.apiV1.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -17,19 +20,24 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    public DataSource dataSource;
+
+    public SecurityConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.builder()
-                .username("julio")
-                .password("{bcrypt}$2a$10$qprkYOE0NzmaRrSyicvQl.X0sOt/B4c1O6DiK/SDEaKArm1JhtY2y")
-                .roles("USER")
-                .build();
-        UserDetails admin = User.builder()
-                .username("antonio")
-                .password("{bcrypt}$2a$10$S3mIQDmGLj.4B0LFVQxx9.xZfvMsx0dKrrTs0O9lok8DcwoDmDXkW")
-                .roles("USER", "ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user,admin);
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth)
+            throws Exception {
+        auth.jdbcAuthentication()
+                .dataSource(dataSource)
+                .usersByUsernameQuery("SELECT i.usuario AS username,i.pwd AS password,'true' AS enabled FROM informacion i WHERE i.usuario=?")
+                .authoritiesByUsernameQuery("SELECT i.usuario AS username,p.rol AS authority FROM permisos p INNER JOIN informacion i on p.idusuario=i.id WHERE i.usuario=?");
     }
 
     @Bean
