@@ -65,14 +65,18 @@ public class LibroController extends BaseController {
     public ResponseEntity<Optional<BookDto>> libroPorCodigo(@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro){
         log.info("Llamando a GET /libros/{codigo} para libro con código "+codLibro);
         Optional<Libro> aDevolver;
+        BookDto libroEncontrado = null;
         try {
             aDevolver = libroService.getLibroPorCodigo(codLibro);
-            log.info("Encontrado libro con código "+codLibro);
+            if (aDevolver.isPresent()) {
+                log.info("Encontrado libro con código "+codLibro);
+                libroEncontrado = cs.convert(aDevolver.get(), BookDto.class);
+            }
+            return ResponseEntity.ok(Optional.ofNullable(libroEncontrado));
         } catch (BookNotFoundException e) {
             log.error("No se encontró el libro con código "+codLibro);
             throw e;
         }
-        return ResponseEntity.ok(Optional.ofNullable(cs.convert(aDevolver,BookDto.class)));
     }
 
     @PostMapping("/libros")
