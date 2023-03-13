@@ -1,6 +1,6 @@
 package com.lodecra.apiV1.util;
 
-import com.lodecra.apiV1.config.AuthenticationFacade;
+import com.lodecra.apiV1.config.auth.AuthenticationFacade;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
