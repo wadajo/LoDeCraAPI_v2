@@ -4,6 +4,7 @@ import com.lodecra.apiV1.dto.BookDto;
 import com.lodecra.apiV1.exception.*;
 import com.lodecra.apiV1.model.Libro;
 import com.lodecra.apiV1.service.port.LibroService;
+import com.lodecra.apiV1.util.Utilidades;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,12 @@ public class LibroController extends BaseController {
 
     private final ConversionService cs;
 
-    public LibroController(LibroService libroService, ConversionService cs) {
+    private final Utilidades util;
+
+    public LibroController(LibroService libroService, ConversionService cs, Utilidades util) {
         this.libroService = libroService;
         this.cs = cs;
+        this.util = util;
     }
 
     @GetMapping("/libros")
@@ -40,6 +44,7 @@ public class LibroController extends BaseController {
              @RequestParam(required = false) String campoABuscar){
         List<Libro> todosLosLibros;
         try {
+            log.info("Usuario autenticado: "+util.usuarioAutenticado());
             if(null!=keyword && null!=campoABuscar) {
                 log.info("Llamando a GET /libros con búsqueda avanzada por "+campoABuscar+". Keyword: " + keyword);
                 todosLosLibros = libroService.getLibrosPorBusquedaAvz(keyword, campoABuscar);
@@ -63,6 +68,7 @@ public class LibroController extends BaseController {
     @GetMapping("/libros/{codLibro}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Optional<BookDto>> libroPorCodigo(@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro){
+        log.info("Usuario autenticado: "+util.usuarioAutenticado());
         log.info("Llamando a GET /libros/{codigo} para libro con código "+codLibro);
         Optional<Libro> aDevolver;
         BookDto libroEncontrado = null;
@@ -84,6 +90,7 @@ public class LibroController extends BaseController {
     public ResponseEntity<BookDto> nuevoLibro(@RequestBody @Valid BookDto nuevo) {
         String titulo = nuevo.name();
         String autor = nuevo.author();
+        log.info("Usuario autenticado: "+util.usuarioAutenticado());
         log.info("Llamando a POST /libros con nuevo libro. Título: "+titulo+". Autor/a: "+autor+".");
         Optional<Libro> guardado;
         try {
@@ -104,6 +111,7 @@ public class LibroController extends BaseController {
     @PutMapping("/libros/{codLibro}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> editarLibro(@RequestBody @Valid BookDto editado, @Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro) {
+        log.info("Usuario autenticado: "+util.usuarioAutenticado());
         log.info("Llamando a PUT /libros/{codigo} con libro de código "+codLibro);
         try {
             var libroExistente = libroService.getLibroPorCodigo(codLibro);
@@ -129,6 +137,7 @@ public class LibroController extends BaseController {
     @DeleteMapping("/libros/{codLibro}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDto> borrarLibro(@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro) {
+        log.info("Usuario autenticado: "+util.usuarioAutenticado());
         log.info("Llamando a DELETE /libros/{codigo} con libro de código "+codLibro);
         try {
             var libroExistente = libroService.getLibroPorCodigo(codLibro);

@@ -1,5 +1,6 @@
 package com.lodecra.apiV1.config;
 
+import com.lodecra.apiV1.util.Utilidades;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -8,7 +9,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -16,6 +20,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private final Utilidades util;
+
+    public SecurityConfig(Utilidades util) {
+        this.util = util;
+    }
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
@@ -41,7 +51,21 @@ public class SecurityConfig {
                 .hasAnyRole("USER","ADMIN")
                 .and()
                 .httpBasic(withDefaults())
+                .exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler())
+                    .authenticationEntryPoint(authenticationFailureHandler())
+                .and()
                 .build();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler(util);
     }
 
 }

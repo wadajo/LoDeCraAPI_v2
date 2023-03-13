@@ -5,6 +5,7 @@ import com.lodecra.apiV1.exception.VolumeAlreadySoldException;
 import com.lodecra.apiV1.exception.WrongVolumeNoException;
 import com.lodecra.apiV1.model.Venta;
 import com.lodecra.apiV1.service.port.VentaService;
+import com.lodecra.apiV1.util.Utilidades;
 import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
@@ -30,14 +31,18 @@ public class VentaController extends BaseController {
 
     private final ConversionService cs;
 
-    public VentaController(VentaService ventaService, ConversionService cs) {
+    private final Utilidades util;
+
+    public VentaController(VentaService ventaService, ConversionService cs, Utilidades util) {
         this.ventaService = ventaService;
         this.cs = cs;
+        this.util = util;
     }
 
     @GetMapping("/sales/{code}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<VentaDto>> mostrarVentasDelLibro (@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable("code") String codLibro) {
+        log.info("Usuario autenticado: "+util.usuarioAutenticado());
         log.info("Llamando a GET /sales para libro de código "+codLibro);
         List<VentaDto> ventasDto=new ArrayList<>();
         ventaService.listarVentasDelLibro(codLibro).forEach(unaVenta->ventasDto.add(cs.convert(unaVenta,VentaDto.class)));
@@ -57,6 +62,7 @@ public class VentaController extends BaseController {
                                                @RequestParam(required = false, name = "price") Integer precioVendido,
                                                @RequestParam(required = false, name = "dateSold")  LocalDateTime fechaHoraVendido){
         try{
+            log.info("Usuario autenticado: "+util.usuarioAutenticado());
             log.info("Llamando a POST /sales para libro de código "+codLibro+" y ejemplar nro. "+nroEjemplar);
             if(null==precioVendido&&null==fechaHoraVendido) {
                 log.info("Venta rápida a precio de lista y fecha actual.");

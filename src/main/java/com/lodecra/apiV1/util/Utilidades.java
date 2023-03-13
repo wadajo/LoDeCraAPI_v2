@@ -1,9 +1,22 @@
 package com.lodecra.apiV1.util;
 
+import com.lodecra.apiV1.config.AuthenticationFacade;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
+import java.security.Principal;
+
 
 @Component
 public class Utilidades {
+
+    private final AuthenticationFacade authenticationFacade;
+
+    public Utilidades(AuthenticationFacade authenticationFacade) {
+        this.authenticationFacade = authenticationFacade;
+    }
+
 
     public static String construirCodigo (int prefix, String titulo, String autor){
         String codigo=prefix+"_";
@@ -57,5 +70,15 @@ public class Utilidades {
         nuevos[0]=autorNuevo;
         nuevos[1]=tituloNuevo;
         return nuevos;
+    }
+
+    public String usuarioAutenticado() {
+        Authentication authentication = authenticationFacade.getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            return authentication.getName();
+        } else {
+            Principal usuario=(Principal)authentication.getPrincipal();
+            return usuario.getName();
+        }
     }
 }
