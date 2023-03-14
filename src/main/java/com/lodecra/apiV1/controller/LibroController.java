@@ -8,8 +8,10 @@ import com.lodecra.apiV1.util.Utilidades;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +33,16 @@ public class LibroController extends BaseController {
 
     private final Utilidades util;
 
-    public LibroController(LibroService libroService, ConversionService cs, Utilidades util) {
+    private final KafkaTemplate<String,String> template;
+
+    @Value("${lodecra.kafka.topic1}")
+    private String KAFKA_TOPIC;
+
+    public LibroController(LibroService libroService, ConversionService cs, Utilidades util, KafkaTemplate<String, String> template) {
         this.libroService = libroService;
         this.cs = cs;
         this.util = util;
+        this.template = template;
     }
 
     @GetMapping("/libros")
@@ -45,14 +53,18 @@ public class LibroController extends BaseController {
         List<Libro> todosLosLibros;
         try {
             log.info("Usuario autenticado: "+util.usuarioAutenticado());
+            template.send(KAFKA_TOPIC,"auth","Se ha autenticado el usuario: "+util.usuarioAutenticado());
             if(null!=keyword && null!=campoABuscar) {
                 log.info("Llamando a GET /libros con búsqueda avanzada por "+campoABuscar+". Keyword: " + keyword);
+                template.send(KAFKA_TOPIC,"endpoint","GET /libros con búsqueda avanzada por "+campoABuscar+". Keyword: " + keyword);
                 todosLosLibros = libroService.getLibrosPorBusquedaAvz(keyword, campoABuscar);
             } else if(null != keyword) {
                 log.info("Llamando a GET /libros con búsqueda general. Keyword: " + keyword);
+                template.send(KAFKA_TOPIC,"endpoint","GET /libros con búsqueda general. Keyword: " + keyword);
                 todosLosLibros = libroService.getLibrosDisponiblesPorBusquedaGral(keyword);
             } else {
                 log.info("Llamando a GET /libros.");
+                template.send(KAFKA_TOPIC,"endpoint","GET /libros");
                 todosLosLibros = libroService.getLibrosDisponibles();
             }
         } catch (EmptySearchException e) {

@@ -9,8 +9,10 @@ import com.lodecra.apiV1.service.port.LibroService;
 import com.lodecra.apiV1.util.Utilidades;
 import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,18 +34,26 @@ public class EjemplarController extends BaseController {
 
     private final Utilidades util;
 
-    public EjemplarController(EjemplarService ejemplarService, LibroService libroService, EjemplarMapper mapper, Utilidades util) {
+    private final KafkaTemplate<String,String> template;
+
+    @Value("${lodecra.kafka.topic1}")
+    private String KAFKA_TOPIC;
+
+    public EjemplarController(EjemplarService ejemplarService, LibroService libroService, EjemplarMapper mapper, Utilidades util, KafkaTemplate<String, String> template) {
         this.ejemplarService = ejemplarService;
         this.libroService = libroService;
         this.mapper = mapper;
         this.util = util;
+        this.template = template;
     }
 
     @GetMapping("/ejemplares/{codLibro}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<EjemplarDto>> ejemplaresDelLibro(@Pattern(regexp = "^\\d{2}_\\w{5}$", message = "Book code doesn't have the correct format")@PathVariable String codLibro){
         log.info("Usuario autenticado: "+util.usuarioAutenticado());
+        template.send(KAFKA_TOPIC,"auth","Se ha autenticado el usuario: "+util.usuarioAutenticado());
         log.info("Llamando a GET /ejemplares/{codLibro} para libro con código "+codLibro);
+        template.send(KAFKA_TOPIC,"endpoint","GET /ejemplares");
         List<Ejemplar> aDevolverEjemplar;
         List<EjemplarDto> aDevolver=new ArrayList<>();
         try {
